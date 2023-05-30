@@ -14,7 +14,8 @@
     "@strapi/plugin-users-permissions": "4.10.5",
     "@strapi/strapi": "4.10.5",
     "better-sqlite3": "8.0.1",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "strapi-plugin-cookie-manager": "^1.1.1"
   },
   "author": {
     "name": "A Strapi developer"

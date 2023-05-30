@@ -1,35 +1,35 @@
 <template>
   <div id="bonus-page">
-    <div v-if="topBanners.length" class="top-slider" v-swiper="swiperTopOption" :loadtheme="false" instanceName="swiper1">
-        <div class="swiper-wrapper">
-            <div class="swiper-slide" :key="banner.id" v-for="banner in topBanners">
-              <img v-show="banner.isActive" :src="banner.banner_img | imgUrl" />
-            </div>
-        </div>
-    </div>
+    <Flicking v-if="topBanners.length" ref="topFlicking" class="top-slider" :options="topOption" :plugins="topPlugins">
+      <div class="flicking-panel" v-for="(banner, index) in topBanners" :key="index">
+        <img v-show="banner.isActive" :src="banner.banner_img | imgUrl" />
+      </div>
+    </Flicking>
     <div class="bonus-banner">
       <img src="./assets/banner.png" alt="">
     </div>
-    <div v-if="bottomBanners.length" class="bottom-slider" v-swiper="swiperBottomOption" :loadtheme="false" instanceName="swiper2" @click="getPromotion(swiper2.realIndex)" >
-        <div class="swiper-wrapper" >
-            <div class="swiper-slide" :key="index" v-for="(banner, index) in bottomBanners">
-              <img v-show="banner.isActive" :src="banner.banner_img | imgUrl" />
-            </div>
-        </div>
-    </div>
+    <Flicking ref="bottomFlicking" v-if="bottomBanners.length" class="bottom-slider" :options="bottomOption" :plugins="bottomPlugins" key="flicking2">
+      <div class="flicking-panel" v-for="(banner, index) in bottomBanners" :key="index" @click="onCliCkReceiveButton">
+        <img v-show="banner.isActive" :src="banner.banner_img | imgUrl" />
+      </div>
+    </Flicking>
     <button type="button" @click="onCliCkReceiveButton" class="bonus-btn">Nhận mã ưu đãi ngay</button>
     <b-modal 
       v-model="isImageModalActive"
-      :width="400" 
+      :width="440" 
       scroll="keep"
       :on-cancel="handleClose"
+      :can-cancel="['x']"
       >
       <div class="card">
         <div class="card-image">
             <figure class="image" style="object-fit: cover;">
                 <img :src="imageUrl">
             </figure>
-        </div>
+          </div>
+          <span class="promotion-code">{{ qrCode }}</span>
+          <span class="promotion-dealine">{{ promotionDeadline }}</span>
+          <qrcode-vue class="qrcode" value="qrCode" size="80" level="H"></qrcode-vue>
       </div>
     </b-modal>
     <div class="license">
@@ -141,77 +141,50 @@
               </a>
             </div>
     </div>
+
   </div>
 </template>
 <script>
-import {
-    directive
-} from "vue-awesome-swiper";
+
 import axios  from 'axios';
+import QrcodeVue from 'qrcode.vue'
 import imgUrl from '@/helper/imgurl'
 const API_URL = "http://localhost:1331/api"
 const IMG_URL = "http://localhost:1331"
+import { AutoPlay, Fade } from "@egjs/flicking-plugins";
 export default {
   name: 'App',
-  directives: {
-        swiper: directive,
-  },
   components: {
+    QrcodeVue,
   },
   data() {
       return {
+        topPlugins: [new AutoPlay({ duration: 1400, direction: "PREV"}), new Fade()],
+        bottomPlugins: [new AutoPlay({ duration: 1400, direction: "NEXT"}), new Fade()],
+        codes: [],
         isImageModalActive: false,
         imageUrl: null,
+        qrCode: null,
+        promotionDeadline: null,
+        currentPromotionId: null,
         topBanners: [],
         bottomBanners: [],
-        swiperTopOption: {
-          spaceBetween: 16,
-          grabCursor: true,
-          centeredSlides: true,
-          slidesPerView: 'auto',
-          speed: 1000,
-          autoplay: {
-              delay: 1500,
-              disableOnInteraction: false
-          },
-          breakpoints: {
-            400: {
-              spaceBetween: 30
-            },
-          },
-        },
-        swiperBottomOption: {
-          spaceBetween: 16,
-          loop: true,
-          grabCursor: true,
-          centeredSlides: true,
-          slidesPerView: 'auto',
-          speed: 1000,
-          preventClicks :true,
-          autoplay: {
-              delay: 1500,
-              disableOnInteraction: false,
-          },
-          breakpoints: {
-            700: {
-              spaceBetween: 30,
-              slidesPerView: '2.4',
-            },
-          },
-          on: {
-            
-          }
-        }
+        topOption: { align: 'center', circular: true , defaultIndex: 1, inputType: ["pointer"], },
+        bottomOption: { align: 'center', circular: true , defaultIndex: 1, inputType: ["pointer"], },
       };
   },
   mounted() {
     this.getPromotionList()
+    this.clearMemory()
   },
   methods: {
-    getPromotionList() {
-      axios.post(`${API_URL}/promotion/promotion-list`)
-        .then((response) => {
-          let promotionList = response.data
+    async getPromotionList() {
+      await axios.post(`${API_URL}/promotion/promotion-list`)
+        .then((res) => {
+          if(localStorage.getItem('codes') === null) {
+            localStorage.setItem('codes', JSON.stringify([]))
+          }
+          let promotionList = res.data
           promotionList.forEach(promotion => {
             if(promotion.position === 'top') {
               this.topBanners.push(promotion)
@@ -220,20 +193,51 @@ export default {
             }
           })
         })
-      console.log(this.topBanners)
-      console.log(this.bottomBanners)
     },
-    getPromotion(index) {
-      this.imageUrl = IMG_URL + this.bottomBanners[index].popup_img.url
-      this.isImageModalActive = !this.isImageModalActive
-    },
-    handleClose() {
-      window.location.reload()
+    async createQrCode() {
+      let data = {
+        today: new Date(),
+        promotion_id: this.currentPromotionId,
+      }
+      await axios.post(`${API_URL}/promotion-log/get-qr-code`, data).then((res) => {
+        this.qrCode = res.data.qr_code
+
+        let available_date = new Date(res.data.createdAt).toJSON().slice(0,10).split('-').reverse().join('/')
+        let old_data = JSON.parse(localStorage.getItem('codes'))
+        old_data.push({code: this.qrCode, createdAt: available_date})
+        localStorage.setItem('codes', JSON.stringify(old_data))
+      })
     },
     onCliCkReceiveButton() {
-      let currentIndex = this.swiper2.realIndex
-      this.imageUrl = IMG_URL + this.bottomBanners[currentIndex].popup_img.url
-      this.isImageModalActive = !this.isImageModalActive
+      let currentIndex = this.$refs.bottomFlicking.index
+      let dl = this.bottomBanners[currentIndex].deadline
+      if(JSON.parse(localStorage.getItem('codes')).length >= 5) {
+        this.$buefy.notification.open({
+          duration: 2500,
+          message: `Số lần lấy mã hôm nay đã hết. </br>Hãy quay lại vào ngày mai nhé`,
+          type: 'is-danger',
+        })
+      }else {
+        this.currentPromotionId = this.bottomBanners[currentIndex].id
+        this.imageUrl = IMG_URL + this.bottomBanners[currentIndex].popup_img.url
+        this.promotionDeadline = new Date(dl).toJSON().slice(0,10).split('-').reverse().join('/')
+        this.isImageModalActive = true
+        this.createQrCode()
+      }
+    },
+    clearMemory() {
+      let memory = JSON.parse(localStorage.getItem('codes'))
+      let lastItem = memory.findLast((e) => e)
+      let lastIndex = memory.findLastIndex((e) => e)
+      let lastDate = lastItem.createdAt
+      let now = new Date().toJSON().slice(0,10).split('-').reverse().join('/')
+      if(lastDate != now) {
+        localStorage.setItem('codes', JSON.stringify([]))
+      }
+      console.log(memory)
+    },
+    handleClose() {
+      this.isImageModalActive = false
     }
   },
 }
@@ -262,21 +266,12 @@ body{
     max-width: 700px;
     width: 100%;
     overflow: hidden;
-    .swiper-wrapper {
-      display: flex;
-      justify-items: center;
-      align-items: center;
-      .swiper-slide {
-        opacity: 0.2;
-        img {
-          height: 100px;
-          max-width: 280px;
-          border-radius: 10px;
-        }
-      }
-      .swiper-slide-active {
-        opacity: 1 !important;
-        transition: 300ms;
+    .flicking-panel {
+      width: 50%;
+      margin: 0 10px;
+      cursor: pointer;
+      img {
+        border-radius: 8px;
       }
     }
   }
@@ -284,23 +279,13 @@ body{
     margin: 10px 0;
     max-width: 700px;
     width: 100%;
-    overflow: hidden;
-    .swiper-wrapper {
-      display: flex;
-      justify-items: center;
-      align-items: center;
-      .swiper-slide {
-        height: 440px;
-        opacity: 0.2;
-        img {
-          height: 100%;
-          max-width: 280px;
-          border-radius: 10px;
-        }
-      }
-      .swiper-slide-active {
-        opacity: 1 !important;
-        transition: 300ms;
+    .flicking-panel {
+      width: 50%;
+      margin: 0 10px;
+      cursor: pointer;
+      img {
+        border-radius: 8px;
+        height: 100%;
       }
     }
   }
@@ -330,6 +315,37 @@ body{
     align-items: center;
     .item {
       width: 45px;
+    }
+  }
+  .modal {
+    .modal-background {
+      background-color: #000;
+    }
+    .modal-content {
+      padding: 10px;
+      .card {
+        position: relative;
+          .promotion-code {
+            position: absolute;
+            font-size: 18px;
+            font-weight: 500;
+            top: 22%;
+            left: 40%;
+          }
+          .promotion-dealine {
+            position: absolute;
+            font-weight: 600;
+            top: 27%;
+            font-size: 14px;
+            left: 40%;
+            color: #000;
+          }
+          .qrcode {
+            position: absolute;
+            bottom: 4%;
+            left: 4%;
+          }
+      }
     }
   }
 }

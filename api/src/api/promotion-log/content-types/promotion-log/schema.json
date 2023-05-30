@@ -1,0 +1,22 @@
+{
+  "kind": "collectionType",
+  "collectionName": "promotion_logs",
+  "info": {
+    "singularName": "promotion-log",
+    "pluralName": "promotion-logs",
+    "displayName": "PromotionLog",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "qr_code": {
+      "type": "string"
+    },
+    "user_id": {
+      "type": "string"
+    }
+  }
+}

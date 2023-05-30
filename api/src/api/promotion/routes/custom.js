@@ -4,6 +4,6 @@ module.exports = {
             method: 'POST',
             path: '/promotion/promotion-list',
             handler: 'promotion.getPromotions',
-        }
+        },
     ]
 }

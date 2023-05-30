@@ -1,0 +1,21 @@
+{
+  "kind": "collectionType",
+  "collectionName": "promotion_users",
+  "info": {
+    "singularName": "promotion-user",
+    "pluralName": "promotion-users",
+    "displayName": "PromotionUser"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "cookies_id": {
+      "type": "string"
+    },
+    "user_id": {
+      "type": "string"
+    }
+  }
+}
