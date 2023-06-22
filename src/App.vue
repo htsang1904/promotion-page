@@ -6,7 +6,6 @@
         </div>
     </Flicking>
     <Flicking ref="bottomFlicking" v-if="bottomBanners.length" class="bottom-slider" :options="bottomOption" :plugins="bottomPlugins" key="flicking2">
-        dsfsdfsdf
         <div class="flicking-panel" v-for="(banner, index) in bottomBanners" :key="index" @click="onCliCkReceiveButton">
             <img v-show="banner.isActive" :src="banner.banner_img | imgUrl" />
         </div>
@@ -28,7 +27,6 @@
         <strong>
             © 2023 Công ty TNHH Guta Việt Nam
         </strong>
-        .All rights reserved.
     </div>
     <VueFooter />
 
@@ -38,10 +36,9 @@
 <script>
 import axios from 'axios';
 import QrcodeVue from 'qrcode.vue'
-import imgUrl from '@/helper/imgurl'
 import VueFooter from '@/components/VueFooter.vue'
-const API_URL = "http://localhost:1331/api"
-const IMG_URL = "http://localhost:1331"
+const API_URL = process.env.VUE_APP_API_URL + '/api'
+const IMG_URL =  process.env.VUE_APP_API_URL
 import {
     AutoPlay,
     Fade
@@ -84,10 +81,16 @@ export default {
             },
         };
     },
+
+    created() {
+        document.title = 'Guta - Ưu đãi'
+    },
+
     mounted() {
         this.getPromotionList()
         this.clearMemory()
     },
+
     methods: {
         async getPromotionList() {
             let promoData =  await axios.post(`${API_URL}/promotion/promotion-list`)
@@ -195,6 +198,7 @@ body {
 
             img {
                 border-radius: 8px;
+                display: block !important;
             }
         }
     }
@@ -206,12 +210,14 @@ body {
 
         .flicking-panel {
             width: 50%;
+            min-width: 300px;
             margin: 0 10px;
             cursor: pointer;
 
             img {
                 border-radius: 8px;
                 height: 100%;
+                display: block !important;
             }
         }
     }
@@ -309,6 +315,11 @@ body {
 
     100% {
         transform: scale(1)
+    }
+}
+.flicking-panel {
+    img {
+       
     }
 }
 </style>

@@ -4,6 +4,10 @@ module.exports = ({ env }) => ({
   app: {
     keys: env.array('APP_KEYS'),
   },
+  url: env('APP_URL', ''),
+  admin: {
+    url: env('APP_URL', '') + '/admin',
+  },
   webhooks: {
     populateRelations: env.bool('WEBHOOKS_POPULATE_RELATIONS', false),
   },

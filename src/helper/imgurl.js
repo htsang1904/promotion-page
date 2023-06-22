@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:1331"
+const API_URL = process.env.VUE_APP_API_URL
 let imgUrl = (value) => {
     if (!value) {
         return '/assets/images/no-image.png';
