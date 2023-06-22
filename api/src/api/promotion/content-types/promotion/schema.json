@@ -31,7 +31,8 @@
       ]
     },
     "isActive": {
-      "type": "boolean"
+      "type": "boolean",
+      "default": true
     },
     "popup_img": {
       "type": "media",
@@ -46,6 +47,20 @@
     },
     "deadline": {
       "type": "date"
+    },
+    "limit_per_day": {
+      "type": "integer"
+    },
+    "limit_per_user": {
+      "type": "integer"
+    },
+    "scheme_code": {
+      "type": "string",
+      "required": true
+    },
+    "expire_days": {
+      "type": "integer",
+      "default": 1
     }
   }
 }

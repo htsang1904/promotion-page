@@ -12,10 +12,21 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "qr_code": {
+    "coupon_code": {
       "type": "string"
     },
-    "user_id": {
+    "scheme_code": {
+      "type": "string"
+    },
+    "promotion": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::promotion.promotion"
+    },
+    "expire_at": {
+      "type": "datetime"
+    },
+    "device_type": {
       "type": "string"
     }
   }
