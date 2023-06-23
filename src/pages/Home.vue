@@ -67,7 +67,6 @@ export default {
             }), new Fade()],
             isLoading: false,
             codes: [],
-            currentPromotionId: null,
             topBanners: [],
             bottomBanners: [],
             topOption: {
@@ -104,7 +103,7 @@ export default {
         createRequestHash() {
             let time = moment().unix()
             let deviceInfo = this.getDeviceInfo()
-            let device_type = deviceInfo.device.type
+            let device_type = deviceInfo.device.type || 'unknown'
             let message = `${time}${device_type}${SALTKEY}`
             let hash = md5(message)
             return {
