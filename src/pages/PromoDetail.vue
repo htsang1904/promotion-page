@@ -7,7 +7,7 @@
         </div>
         <div class="promotion-code-detail">
             <div class="qr-code">
-                <qrcode-vue class="qrcode" v-model="promoDetail.coupon_code" size="100" level="H"></qrcode-vue>
+                <qrcode-vue class="qrcode" :value="qrCodeRender(promoDetail.coupon_code)" size="100" level="H"></qrcode-vue>
             </div>
             <div class="code-detail">
                 <div class="promotion-code">
@@ -74,6 +74,11 @@ export default {
         moment(time) {
             return moment().format('DD/MM') + ' - ' + moment(time).format('DD/MM/YYYY')
         },
+
+        qrCodeRender(code) {
+            if (!code) return ''
+            return 'C-' + code
+        }
     }
 }
 </script>

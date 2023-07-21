@@ -21,6 +21,11 @@ export default new Router({
                     component: () => import('../pages/Home.vue'),
                 },
                 {
+                    path: '/QeFBd',
+                    name: 'Campaign',
+                    component: () => import('../pages/Campaign.vue'),
+                },
+                {
                     path: '/nhan-uu-dai',
                     name: 'PromoDetail',
                     component: () => import(/* webpackChunkName: "promo-detail" */ '../pages/PromoDetail.vue'),

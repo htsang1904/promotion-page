@@ -1,5 +1,5 @@
 <template>
-<div id="app">
+<div id="app-content">
     <router-view></router-view>
 </div>
 </template>
@@ -9,5 +9,13 @@
 body {
     margin: 0;
     font-family: Montserrat;
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    align-items: center;
+    min-height: 100vh;
+}
+#app-content {
+    width: 100%;
 }
 </style>
