@@ -12,7 +12,7 @@
             <div class="code-detail">
                 <div class="promotion-code">
                     Mã coupon: <br/><span>{{ promoDetail.coupon_code }}</span></div>
-                <div class="promotion-dealine">Thời hạn sử dụng: <br/><b>{{ moment(promoDetail.expire_at) }}</b></div>
+                <div class="promotion-expired">Thời hạn sử dụng: <br/><b>{{ moment(promoDetail) }}</b></div>
             </div>
         </div>
     </div>
@@ -71,8 +71,8 @@ export default {
             })
         },
 
-        moment(time) {
-            return moment().format('DD/MM') + ' - ' + moment(time).format('DD/MM/YYYY')
+        moment(item) {
+            return moment(item.createdAt).format('DD/MM') + ' - ' + moment(item.expire_at).format('DD/MM/YYYY')
         },
 
         qrCodeRender(code) {
@@ -111,11 +111,15 @@ export default {
         }
         .code-detail {
             width: 160px;
+            font-size: 14px;
             .promotion-code {
                 span {
-                    font-size: 18px;
+                    font-size: 16px;
                     font-weight: bold;
                 }
+            }
+            .promotion-expired {
+                font-size: 14px;
             }
         }
         @media (max-width: 450px) {
