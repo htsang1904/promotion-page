@@ -10,6 +10,11 @@
   "dependencies": {
     "@egjs/flicking-plugins": "^4.7.0",
     "@egjs/vue-flicking": "^4.10.7",
+    "@fortawesome/fontawesome-svg-core": "^6.4.0",
+    "@fortawesome/free-brands-svg-icons": "^6.4.0",
+    "@fortawesome/free-regular-svg-icons": "^6.4.0",
+    "@fortawesome/free-solid-svg-icons": "^6.4.0",
+    "@fortawesome/vue-fontawesome": "^2.0.10",
     "axios": "^1.4.0",
     "buefy": "^0.9.23",
     "core-js": "^3.8.3",
@@ -28,7 +33,7 @@
     "vue-awesome-swiper": "4.1.1",
     "vue-axios": "^3.5.2",
     "vue-cookies": "^1.8.3",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.6.5"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
