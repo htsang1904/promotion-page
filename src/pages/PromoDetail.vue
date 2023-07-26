@@ -93,9 +93,10 @@ export default {
                 parent: this,
                 component: ScreenshotTutorial,
                 trapFocus: true,
+                hasModalCard: true,
                 canCancel: [''],
                 width: '90%',
-                scroll: 'clip'
+                scroll: 'keep'
             })
         }
     }
@@ -162,9 +163,9 @@ export default {
 
     .front {
         display: block;
-        padding: 6px 10px;
+        padding: 10px 10px;
         border-radius: 6px;
-        font-size: 12px;
+        font-size: 14px;
         background-color: #034ab3;
         color: white;
         transform: translateY(-6px);
