@@ -198,6 +198,7 @@ export default {
             font-weight: 700;
             font-size: 16px;
             margin-bottom: 10px;
+            text-align: center;
         }
         .image {
             width: 100%;
