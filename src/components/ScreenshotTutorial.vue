@@ -62,7 +62,7 @@ export default {
             isOpen: null,
             collapses: [
                 {
-                    title: 'Apple', 
+                    title: 'iPhone', 
                     description: [
                         {
                             text: 'Đối với iPhone có nút home',
