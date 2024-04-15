@@ -24,7 +24,8 @@ module.exports = createCoreController('api::promotion-log.promotion-log', ({
       }
       let now = Math.floor(Date.now() / 1000)
       let hash = md5(request.time + request.device_type + SALTKEY)
-      if (now - request.time > 10 || hash !== request.hash) {
+      console.log(hash, request.hash, request.time, now, now - request.time)
+      if (now - request.time > 20 || hash !== request.hash) {
         return {
           success: false,
           message: 'Request không hợp lệ'
