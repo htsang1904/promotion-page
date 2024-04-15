@@ -1,5 +1,5 @@
 <template>
-    <div class="card" v-if="promoDetail && promotion" ref="promo_card">
+    <div class="promotion-card" v-if="promoDetail && promotion" ref="promo_card">
         <div class="card-image">
             <figure class="image" style="object-fit: cover;">
                 <img v-if="promotion.imageUrl" :src="promotion.imageUrl">
@@ -15,6 +15,11 @@
                 <div class="promotion-expired">Thời hạn sử dụng: <br/><b>{{ moment(promoDetail) }}</b></div>
             </div>
         </div>
+        <div>
+            <button class="pushable" @click="showPopup">
+                <span class="front">Hướng dẫn chụp màn hình điện thoại</span>
+            </button>
+        </div>
     </div>
 </template>
 <script>
@@ -25,9 +30,12 @@ import moment from 'moment'
 import axios from 'axios'
 import QrcodeVue from 'qrcode.vue'
 import VueFooter from '@/components/VueFooter.vue'
+
+import ScreenshotTutorial from '@/components/ScreenshotTutorial.vue'
 export default {
     components: {
-        QrcodeVue
+        QrcodeVue,
+        ScreenshotTutorial
     },
     data() {
         return {
@@ -78,12 +86,24 @@ export default {
         qrCodeRender(code) {
             if (!code) return ''
             return 'C-' + code
+        },
+
+        showPopup() {
+            this.$buefy.modal.open({
+                parent: this,
+                component: ScreenshotTutorial,
+                trapFocus: true,
+                hasModalCard: true,
+                canCancel: [''],
+                width: '90%',
+                scroll: 'keep'
+            })
         }
     }
 }
 </script>
 <style lang="scss">
-.card {
+.promotion-card {
     position: relative;
     max-width: 500px;
     width: 100%;
@@ -125,6 +145,36 @@ export default {
         @media (max-width: 450px) {
             top: 28%;
         }
+    }
+    .pushable {
+        background-color: #013787;
+        border-radius: 6px;
+        border: none;
+        margin-top: 14px;
+        padding: 0;
+        cursor: pointer;
+        outline-offset: 4px;
+        width: 100%;
+    }
+
+    .pushable:focus:not(:focus-visible) {
+        outline: none;
+    }
+
+    .front {
+        display: block;
+        padding: 10px 10px;
+        border-radius: 6px;
+        font-size: 14px;
+        background-color: #034ab3;
+        color: white;
+        transform: translateY(-6px);
+        font-family: 'Montserrat', sans-serif;
+        font-weight: bold;
+    }
+
+    .pushable:active .front {
+        transform: translateY(-2px);
     }
 }
 </style>
