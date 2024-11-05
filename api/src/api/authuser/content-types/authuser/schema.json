@@ -1,0 +1,28 @@
+{
+  "kind": "collectionType",
+  "collectionName": "authusers",
+  "info": {
+    "singularName": "authuser",
+    "pluralName": "authusers",
+    "displayName": "Authuser"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string",
+      "unique": true
+    },
+    "promotion_logs": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::promotion-log.promotion-log",
+      "mappedBy": "authuser"
+    }
+  }
+}

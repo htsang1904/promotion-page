@@ -1,0 +1,48 @@
+{
+  "name": "promotion",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
+    "deploy": "vite build && zmp deploy"
+  },
+  "dependencies": {
+    "@egjs/flicking-plugins": "^4.7.0",
+    "@egjs/vue-flicking": "^4.10.7",
+    "@fortawesome/fontawesome-svg-core": "^6.4.0",
+    "@fortawesome/free-brands-svg-icons": "^6.4.0",
+    "@fortawesome/free-regular-svg-icons": "^6.4.0",
+    "@fortawesome/free-solid-svg-icons": "^6.4.0",
+    "@fortawesome/vue-fontawesome": "^2.0.10",
+    "axios": "^1.6.3",
+    "buefy": "^0.9.23",
+    "core-js": "^3.8.3",
+    "device-detector-js": "^3.0.3",
+    "font-awesome": "^4.7.0",
+    "js-md5": "^0.7.3",
+    "jsbarcode": "^3.11.5",
+    "jsonwebtoken": "^9.0.0",
+    "lodash-es": "^4.17.21",
+    "moment": "^2.29.4",
+    "qrcode.vue": "1.7",
+    "sass": "1.55.0",
+    "sass-loader": "13.0.2",
+    "swiper": "^5.4.5",
+    "vant": "^2.13.2",
+    "vite-plugin-vue2": "^2.0.3",
+    "vue": "^2.6.14",
+    "vue-awesome-swiper": "4.1.1",
+    "vue-axios": "^3.5.2",
+    "vue-cookies": "^1.8.3",
+    "vue-router": "^3.6.5",
+    "zmp-sdk": "^2.41.0",
+    "zmp-ui": "^1.11.5"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "postcss-preset-env": "^6.7.0",
+    "sass": "^1.80.4",
+    "vite": "^2.6.14"
+  }
+}

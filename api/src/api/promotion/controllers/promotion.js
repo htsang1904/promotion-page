@@ -15,5 +15,6 @@ module.exports = createCoreController('api::promotion.promotion', ({strapi}) => 
             }
         })
         return promotionList
-    }
+    },
+    
 }));

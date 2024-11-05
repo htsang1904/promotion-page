@@ -28,6 +28,27 @@
     },
     "device_type": {
       "type": "string"
+    },
+    "authuser": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::authuser.authuser",
+      "inversedBy": "promotion_logs"
+    },
+    "imgFrontUrl": {
+      "type": "text"
+    },
+    "deadline": {
+      "type": "date"
+    },
+    "isActive": {
+      "type": "boolean"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "imgBackUrl": {
+      "type": "text"
     }
   }
 }

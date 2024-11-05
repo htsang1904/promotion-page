@@ -31,7 +31,8 @@ module.exports = createCoreController('api::promotion-log.promotion-log', ({
           message: 'Request không hợp lệ'
         }
       }
-      let promotionDetail = await strapi.entityService.findOne('api::promotion.promotion', request.promotion_id)
+      let promotionDetail = await strapi.entityService.findOne('api::promotion.promotion', request.promotion_id,{populate: {banner_img: true, popup_img: true},})
+
       if (promotionDetail) {
         if (promotionDetail.limit_per_day > 0) {
           let today = new Date()
@@ -79,7 +80,7 @@ module.exports = createCoreController('api::promotion-log.promotion-log', ({
         let res = await axios.post(platformEndpoint, data, {
           headers: postHeaders
         })
-
+        
         if (res.data && res.data.success) {
           let createLog = await strapi.entityService.create('api::promotion-log.promotion-log', {
             data: {
@@ -88,6 +89,11 @@ module.exports = createCoreController('api::promotion-log.promotion-log', ({
               promotion: promotionDetail.id,
               expire_at: res.data.expire_at,
               device_type: request.device_type,
+              deadline:promotionDetail.deadline,
+              isActive:promotionDetail.isActive,
+              phone:request.phone,
+              imgFrontUrl:promotionDetail.banner_img.url,
+              imgBackUrl:promotionDetail.popup_img.url,
             }
           })
           delete createLog.id
@@ -119,5 +125,65 @@ module.exports = createCoreController('api::promotion-log.promotion-log', ({
     let userID = ctx.request.header.cookie
     console.log(userID)
   },
+
+  async getPromotionLog(ctx){
+    const { phone, page = 1, pageSize = 10 } = ctx.query;
+
+    try {
+        // Chuyển đổi `page` và `pageSize` thành số
+        const currentPage = parseInt(page, 10);
+        const limit = parseInt(pageSize, 10);
+        const start = (currentPage - 1) * limit; // Vị trí bắt đầu dựa trên trang hiện tại và số lượng trên mỗi trang
+
+        const promotionList = await strapi.entityService.findMany('api::promotion-log.promotion-log', {
+            filters: {
+                phone: phone ? { $eq: phone } : undefined, isActive: true
+            },
+            start: start,
+            limit: limit,
+        });
+
+        // Lấy tổng số lượng bản ghi để tính toán phân trang
+        const totalItems = await strapi.entityService.count('api::promotion-log.promotion-log', {
+            filters: {
+                phone: phone ? { $eq: phone } : undefined,
+            },
+        });
+
+        const totalPages = Math.ceil(totalItems / limit);
+
+        return {
+            success: true,
+            data: promotionList,
+            pagination: {
+                page: currentPage,
+                pageSize: limit,
+                totalPages: totalPages,
+                totalItems: totalItems,
+            },
+        };
+    } catch (error) {
+        return {
+            success: false,
+            message: 'Có lỗi xảy ra khi lấy danh sách khuyến mãi',
+            error: error.message,
+        };
+    }},
+    async getPromotionDetail(ctx) {
+      try {
+        const { code } = ctx.params;
+        const discount = await strapi.db.query('api::promotion-log.promotion-log').findOne({
+          where: { coupon_code: code },
+        });
+  
+        if (!discount) {
+          return ctx.notFound('Mã giảm giá không tồn tại');
+        }
+  
+        ctx.send(discount);
+      } catch (error) {
+        ctx.throw(500, 'Lỗi khi lấy chi tiết mã giảm giá');
+      }
+    },
 
 }));
