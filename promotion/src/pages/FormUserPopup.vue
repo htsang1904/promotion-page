@@ -94,6 +94,7 @@
 
 <script>
 const key = import.meta.env.SECRET_KEY
+const API_URL = import.meta.env.VITE_APP_API_URL + '/api'
 import axios from 'axios';
 import { followOA, getUserInfo, getAccessToken, getPhoneNumber } from "zmp-sdk/apis";
 
@@ -105,8 +106,8 @@ export default {
             isSwitched: false,
             isSwitchedCustom: "Bấm để theo dõi",
             carousels: [],
-            userName: 'nam',
-            phoneNumber: '0976750578',
+            userName: '',
+            phoneNumber: '',
             userInfo: [],
             phoneToken: '',
             userAccessToken: '',
@@ -165,7 +166,7 @@ export default {
                     this.userInfo = response.userInfo;
                     console.log(response);
                     if (this.userInfo.name !== null) {
-                        // this.userName = this.userInfo.name
+                        this.userName = this.userInfo.name
                         this.avatar = this.userInfo.avatar
                         let userdata = localStorage.getItem('user')
                         if (userdata.length - 2 === 0) {
@@ -213,7 +214,7 @@ export default {
             } else if (this.phoneNumber === null | this.phoneNumber === '') {
                 console.log('vui long nhap so dien thoai');
             } else {
-                let userData = await axios.post('http://localhost:1331/api/auth/login', {
+                let userData = await axios.post(`${API_URL}/api/auth/login`, {
                     name: this.userName,
                     phone: this.phoneNumber
                 });

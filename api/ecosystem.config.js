@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'GutaUudaiAPI',
+      name: 'zPromoAPI',
       script: 'npm',
       args: 'start',
     },

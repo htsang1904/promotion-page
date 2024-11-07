@@ -6,7 +6,7 @@
             <div v-for="(data, index) in historylist" :key="index">
                 <div class="historyItem" @click="openCouponDetail(data.coupon_code)">
                     <div class="historycontainer1">
-                        <img class="imghistory" :src="'http://localhost:1331' + data.imgFrontUrl" alt="">
+                        <img class="imghistory" :src="`${API_URL}` + data.imgFrontUrl" alt="">
                     </div>
                     <div class="historycontainer2">
                         <div class="historytitle">Mã Coupon:</div>
@@ -24,6 +24,7 @@
 </template>
 
 <script>
+const API_URL = import.meta.env.VITE_APP_API_URL 
 import axios from 'axios';
 import moment from 'moment';
 import CheckUserPopup from '../popup/CheckUserPopup.vue';
@@ -66,7 +67,7 @@ export default {
                 let user1 = JSON.parse(userdata)
                 console.log(user1[0].phone);
                 let phone = user1[0].phone
-                let dataHistory = await axios.get(`http://localhost:1331/api/promotion-log?phone=${phone}&page=${this.page}&pageSize=5`)
+                let dataHistory = await axios.get(`${API_URL}/api/promotion-log?phone=${phone}&page=${this.page}&pageSize=5`)
                 console.log(dataHistory);
                 if (dataHistory.status === 200) {
                     this.historylist.push(...dataHistory.data.data) 

@@ -9,7 +9,7 @@
             <div class="promotion-card" v-if="promoDetail" ref="promo_card">
                 <div class="card-image">
                     <figure class="image" style="object-fit: cover;">
-                        <img v-if="promoDetail.imgBackUrl" :src="'http://localhost:1331' + promoDetail.imgBackUrl">
+                        <img v-if="promoDetail.imgBackUrl" :src="`${API_URL}` + promoDetail.imgBackUrl">
                     </figure>
                 </div>
                 <div class="promotion-code-detail">
