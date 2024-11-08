@@ -1,12 +1,12 @@
 <template>
-    <div>
+    <div class="containerHistory1">
         <CheckUserPopup v-if="islogin === false"/>
         <div class="containerHistory" v-if="islogin === true">
             <div class="titlehistoryheader">Quà của bạn</div>
             <div v-for="(data, index) in historylist" :key="index">
-                <div class="historyItem" @click="openCouponDetail(data.coupon_code)">
+                <div class="historyItem" @click="checkUsingCoupon(data)">
                     <div class="historycontainer1">
-                        <img class="imghistory" :src="`${API_URL}` + data.imgFrontUrl" alt="">
+                        <img class="imghistory" :src="url + data.promotion.banner_img.url" alt="">
                     </div>
                     <div class="historycontainer2">
                         <div class="historytitle">Mã Coupon:</div>
@@ -43,13 +43,27 @@ export default {
             page:1,
             isLoadAll:false,
             isOpenDetail:false,
-            coupon_code:''
+            coupon_code:'',
+            url: API_URL
         }
     },
     mounted() {
         this.gethistory()
     },
     methods: {
+        async checkUsingCoupon(data){
+            let checkCoupon = await axios.get(`https://lab-gapi.guta.asia/webapi/public/coupon-child-checker?coupon_child_code=${data.coupon_code}&coupon_code=${data.scheme_code}`)
+            if (checkCoupon.data.coupon_child.is_used === 0) {
+                this.openCouponDetail(data.coupon_code)
+            }else{
+                this.$buefy.notification.open({
+                        duration: 2500,
+                        message: `Mã giảm giá này đã được dùng`,
+                        type: 'is-danger',
+                        position: 'is-top',
+                    })
+            }
+        },
         openCouponDetail(code){
             this.coupon_code = code
             this.isOpenDetail = true
@@ -68,9 +82,9 @@ export default {
                 console.log(user1[0].phone);
                 let phone = user1[0].phone
                 let dataHistory = await axios.get(`${API_URL}/api/promotion-log?phone=${phone}&page=${this.page}&pageSize=5`)
-                console.log(dataHistory);
                 if (dataHistory.status === 200) {
-                    this.historylist.push(...dataHistory.data.data) 
+                    this.historylist.push(...dataHistory.data.data)
+                    console.log(this.historylist);
                     this.pagination = dataHistory.data.pagination
                     if (this.historylist.length === this.pagination.totalItems) {
                         this.isLoadAll = true
@@ -90,6 +104,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.containerHistory1{
+    margin-top: 60px;
+}
 .containerHistory {
     width: 100%;
     height: 100%;

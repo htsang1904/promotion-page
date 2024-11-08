@@ -88,12 +88,8 @@ module.exports = createCoreController('api::promotion-log.promotion-log', ({
               coupon_code: res.data.coupon_code,
               promotion: promotionDetail.id,
               expire_at: res.data.expire_at,
-              device_type: request.device_type,
-              deadline:promotionDetail.deadline,
               isActive:promotionDetail.isActive,
               phone:request.phone,
-              imgFrontUrl:promotionDetail.banner_img.url,
-              imgBackUrl:promotionDetail.popup_img.url,
             }
           })
           delete createLog.id
@@ -138,6 +134,10 @@ module.exports = createCoreController('api::promotion-log.promotion-log', ({
         const promotionList = await strapi.entityService.findMany('api::promotion-log.promotion-log', {
             filters: {
                 phone: phone ? { $eq: phone } : undefined, isActive: true
+            },populate:{
+              promotion: {
+                populate:"*"
+              }
             },
             start: start,
             limit: limit,
@@ -174,6 +174,11 @@ module.exports = createCoreController('api::promotion-log.promotion-log', ({
         const { code } = ctx.params;
         const discount = await strapi.db.query('api::promotion-log.promotion-log').findOne({
           where: { coupon_code: code },
+          populate:{
+            promotion: {
+              populate:true
+            }
+          }
         });
   
         if (!discount) {

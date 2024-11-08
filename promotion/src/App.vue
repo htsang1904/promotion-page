@@ -53,13 +53,11 @@ body {
 
 .containerApp {
     width: 100%;
-    height: 100%;
+    height: 100vh;
     user-select: none;
 }
 
 #app-content {
     width: 100%;
-    margin-top: 60px;
-    margin-bottom: 60px;
 }
 </style>

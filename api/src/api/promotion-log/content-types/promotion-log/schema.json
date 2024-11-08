@@ -21,7 +21,8 @@
     "promotion": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "api::promotion.promotion"
+      "target": "api::promotion.promotion",
+      "inversedBy": "promotion_log"
     },
     "expire_at": {
       "type": "datetime"
@@ -35,20 +36,11 @@
       "target": "api::authuser.authuser",
       "inversedBy": "promotion_logs"
     },
-    "imgFrontUrl": {
-      "type": "text"
-    },
-    "deadline": {
-      "type": "date"
-    },
     "isActive": {
       "type": "boolean"
     },
     "phone": {
       "type": "string"
-    },
-    "imgBackUrl": {
-      "type": "text"
     }
   }
 }

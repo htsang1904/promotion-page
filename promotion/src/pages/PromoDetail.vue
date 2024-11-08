@@ -111,6 +111,7 @@ export default {
     width: 100%;
     margin: 20px auto 0;
     padding: 10px;
+    margin-top: 60px;
     .promotion-code-detail {
         position: absolute;
         top: 30%;

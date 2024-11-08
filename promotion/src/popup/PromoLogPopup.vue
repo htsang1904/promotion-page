@@ -4,12 +4,12 @@
             <div class="header">
                 <div class="backgroundbackbtn" @click="closePopup">
                     <b-icon class="backbtn" icon="xmark"></b-icon>
-                </div><img class="homelogo" src="../assets/home-logo.png" alt="">
+                </div>
             </div>
             <div class="promotion-card" v-if="promoDetail" ref="promo_card">
                 <div class="card-image">
                     <figure class="image" style="object-fit: cover;">
-                        <img v-if="promoDetail.imgBackUrl" :src="`${API_URL}` + promoDetail.imgBackUrl">
+                        <img v-if="promoDetail.promotion.popup_img.url" :src="url + promoDetail.promotion.popup_img.url">
                     </figure>
                 </div>
                 <div class="promotion-code-detail">
@@ -20,7 +20,7 @@
                     <div class="code-detail">
                         <div class="promotion-code">
                             Mã coupon: <br /><span>{{ promoDetail.coupon_code }}</span></div>
-                        <div class="promotion-expired">Thời hạn sử dụng: <br /><b>{{ moment(promoDetail.deadline) }}</b>
+                        <div class="promotion-expired">Thời hạn sử dụng: <br /><b>{{ moment(promoDetail.promotion.deadline) }}</b>
                         </div>
                     </div>
                 </div>
@@ -53,6 +53,7 @@ export default {
         return {
             promoDetail: null,
             promotion: null,
+            url:IMG_URL
         }
     },
 
@@ -72,7 +73,7 @@ export default {
             axios.get(`${API_URL}/promotion-log/${this.coupon_code}`)
                 .then(res => {
                     this.promoDetail = res.data
-                    console.log(res);
+                    console.log(this.promoDetail);
                 })
                 .catch(err => {
                     console.log(err);
@@ -129,7 +130,6 @@ export default {
     width: 100%;
     box-shadow: rgba(185, 185, 189, 0.2) 0px 7px 29px 0px;
     z-index: 100;
-    background-color: #215AA8;
     align-items: center;
     align-content: center;
     justify-content: center;

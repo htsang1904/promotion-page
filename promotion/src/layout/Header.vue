@@ -26,7 +26,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.header{
+.header {
     position: fixed;
     top: 0;
     height: 60px;
@@ -37,7 +37,8 @@ export default {
     align-items: center;
     align-content: center;
     box-sizing: border-box;
-    .homelogo{
+
+    .homelogo {
         height: 20px;
         margin-left: 10px;
     }

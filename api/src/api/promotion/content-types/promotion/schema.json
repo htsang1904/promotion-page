@@ -61,6 +61,12 @@
     "expire_days": {
       "type": "integer",
       "default": 1
+    },
+    "promotion_log": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::promotion-log.promotion-log",
+      "mappedBy": "promotion"
     }
   }
 }

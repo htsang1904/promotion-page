@@ -94,7 +94,7 @@
 
 <script>
 const key = import.meta.env.SECRET_KEY
-const API_URL = import.meta.env.VITE_APP_API_URL + '/api'
+const API_URL = import.meta.env.VITE_APP_API_URL
 import axios from 'axios';
 import { followOA, getUserInfo, getAccessToken, getPhoneNumber } from "zmp-sdk/apis";
 
@@ -106,8 +106,8 @@ export default {
             isSwitched: false,
             isSwitchedCustom: "Bấm để theo dõi",
             carousels: [],
-            userName: '',
-            phoneNumber: '',
+            userName: 'nam',
+            phoneNumber: '0976750578',
             userInfo: [],
             phoneToken: '',
             userAccessToken: '',
@@ -166,7 +166,7 @@ export default {
                     this.userInfo = response.userInfo;
                     console.log(response);
                     if (this.userInfo.name !== null) {
-                        this.userName = this.userInfo.name
+                        // this.userName = this.userInfo.name
                         this.avatar = this.userInfo.avatar
                         let userdata = localStorage.getItem('user')
                         if (userdata.length - 2 === 0) {
@@ -227,6 +227,14 @@ export default {
 
             }
         },
+        notFollowOa() {
+            this.$buefy.notification.open({
+                duration: 2500,
+                message: `Hãy theo dõi OA để có thể đăng ký nhé!`,
+                type: 'is-danger',
+                position: 'is-top',
+            })
+        }
     }
 }
 </script>
@@ -238,7 +246,7 @@ export default {
     width: 100vw;
     background-color: white;
     box-sizing: border-box;
-
+    margin-top: 60px;
     .headerPopup {
         height: 40px;
         align-content: center;
@@ -448,15 +456,18 @@ input:checked+.slider:before {
         margin-left: 10px;
         align-items: center;
         width: 80%;
-        .usernameLogindetail{
+
+        .usernameLogindetail {
             width: 100%;
         }
+
         .phoneuserlogin {
             font-weight: 400;
             font-size: 12px;
             color: #9d9c9c;
         }
-        .imggift{
+
+        .imggift {
             width: 20px;
             height: 20px;
         }

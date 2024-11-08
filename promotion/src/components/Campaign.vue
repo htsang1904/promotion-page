@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="containerbonus-page">
         <div id="bonus-page">
             <Flicking v-if="topBanners.length" ref="topFlicking" class="top-slider" :options="topOption"
                 :plugins="topPlugins">
@@ -266,14 +266,20 @@ export default {
 
 
 <style lang="scss">
+.containerbonus-page{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
 #bonus-page {
     display: flex;
+    box-sizing: border-box;
     flex-direction: column;
     justify-items: center;
     align-items: center;
-    min-height: 100vh;
     width: 100%;
-
+    
     .bonus-banner {
         img {
             width: 100%;

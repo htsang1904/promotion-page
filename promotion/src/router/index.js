@@ -6,7 +6,7 @@ Vue.use(Router);
 
 export default new Router({
     mode: 'hash',
-    base: process.env.BASE_URL || '/',
+    base: import.meta.env.VITE_APP_BASE_URL || '/',
     scrollBehavior: () => ({y: 0}),
     routes: [
         {
