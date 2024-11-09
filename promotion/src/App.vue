@@ -24,17 +24,9 @@ export default {
     },
 
     mounted() {
-        window.addEventListener('beforeunload', this.clearLocalStorage);
-    },
-    beforeDestroy() {
-        // Hủy sự kiện beforeunload khi component bị hủy
-        window.removeEventListener('beforeunload', this.clearLocalStorage);
+        localStorage.removeItem('user')
     },
     methods: {
-        clearLocalStorage() {
-            // Xóa toàn bộ localStorage khi đóng trình duyệt
-            localStorage.clear();
-        }
     }
 }
 </script>

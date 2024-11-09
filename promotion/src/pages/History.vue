@@ -5,14 +5,14 @@
             <div class="titlehistoryheader">Quà của bạn</div>
             <div v-for="(data, index) in historylist" :key="index">
                 <div class="historyItem" @click="checkUsingCoupon(data)">
-                    <div class="historycontainer1">
-                        <img class="imghistory" :src="url + data.promotion.banner_img.url" alt="">
+                    <div class="historycontainer1" v-if="data.promotion">
+                        <img class="imghistory" :src="bannerimg(data)" alt="">
                     </div>
                     <div class="historycontainer2">
                         <div class="historytitle">Mã Coupon:</div>
                         <div>{{ data.coupon_code }}</div>
                         <div class="historytitle">Thời hạn sử dụng:</div>
-                        <div>{{ formatDate(data.deadline) }}</div>
+                        <div>{{ formatDate(data.promotion.deadline) }}</div>
                     </div>
                 </div>
             </div>
@@ -44,13 +44,16 @@ export default {
             isLoadAll:false,
             isOpenDetail:false,
             coupon_code:'',
-            url: API_URL
+            url: API_URL,
         }
     },
     mounted() {
         this.gethistory()
     },
     methods: {
+        bannerimg(data){
+            return this.url + data.promotion.banner_img.url
+        },
         async checkUsingCoupon(data){
             let checkCoupon = await axios.get(`https://lab-gapi.guta.asia/webapi/public/coupon-child-checker?coupon_child_code=${data.coupon_code}&coupon_code=${data.scheme_code}`)
             if (checkCoupon.data.coupon_child.is_used === 0) {
@@ -82,11 +85,12 @@ export default {
                 console.log(user1[0].phone);
                 let phone = user1[0].phone
                 let dataHistory = await axios.get(`${API_URL}/api/promotion-log?phone=${phone}&page=${this.page}&pageSize=5`)
+                console.log(dataHistory);
                 if (dataHistory.status === 200) {
                     this.historylist.push(...dataHistory.data.data)
                     console.log(this.historylist);
                     this.pagination = dataHistory.data.pagination
-                    if (this.historylist.length === this.pagination.totalItems) {
+                    if (this.historylist.length === this.pagination.totalItems ) {
                         this.isLoadAll = true
                         console.log(this.isLoadAll);
                         
@@ -105,13 +109,14 @@ export default {
 
 <style lang="scss" scoped>
 .containerHistory1{
-    margin-top: 60px;
+    display: flex;
+    height: 100vh;
 }
 .containerHistory {
     width: 100%;
     height: 100%;
     padding: 10px;
-
+    margin-top: 60px;
     .titlehistoryheader {
         font-size: 14px;
         font-weight: 600;

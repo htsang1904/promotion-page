@@ -90,6 +90,7 @@ module.exports = createCoreController('api::promotion-log.promotion-log', ({
               expire_at: res.data.expire_at,
               isActive:promotionDetail.isActive,
               phone:request.phone,
+              getdate:request.getdate
             }
           })
           delete createLog.id
@@ -134,7 +135,8 @@ module.exports = createCoreController('api::promotion-log.promotion-log', ({
         const promotionList = await strapi.entityService.findMany('api::promotion-log.promotion-log', {
             filters: {
                 phone: phone ? { $eq: phone } : undefined, isActive: true
-            },populate:{
+            },
+            populate:{
               promotion: {
                 populate:"*"
               }
@@ -169,6 +171,29 @@ module.exports = createCoreController('api::promotion-log.promotion-log', ({
             error: error.message,
         };
     }},
+
+    async checkPromotionLog(ctx){
+      const { phone ,getdate } = ctx.query;
+      try {
+          const promotionList = await strapi.entityService.findMany('api::promotion-log.promotion-log', {
+              filters: {
+                  phone: phone ? { $eq: phone } : undefined, 
+                  isActive: true,
+                  getdate: getdate? { $eq: getdate } : undefined,
+              }
+          });
+          return {
+              success: true,
+              data: promotionList,
+          };
+      } catch (error) {
+          return {
+              success: false,
+              message: 'Có lỗi xảy ra khi lấy danh sách khuyến mãi',
+              error: error.message,
+          };
+      }},
+
     async getPromotionDetail(ctx) {
       try {
         const { code } = ctx.params;

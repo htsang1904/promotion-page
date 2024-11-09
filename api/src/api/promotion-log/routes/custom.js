@@ -17,6 +17,11 @@ module.exports = {
         },
         {
             method: 'GET',
+            path: '/checkpromotion-log',
+            handler: 'promotion-log.checkPromotionLog',
+        },
+        {
+            method: 'GET',
             path: '/promotion-log/:code',
             handler: 'promotion-log.getPromotionDetail',
             config: {

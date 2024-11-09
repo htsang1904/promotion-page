@@ -1,30 +1,33 @@
 <template>
-    <div class="promotion-card" v-if="promoDetail && promotion" ref="promo_card">
-        <div class="card-image">
-            <figure class="image" style="object-fit: cover;">
-                <img v-if="promotion.imageUrl" :src="promotion.imageUrl">
-            </figure>
-        </div>
-        <div class="promotion-code-detail">
-            <div class="qr-code">
-                <qrcode-vue class="qrcode" :value="qrCodeRender(promoDetail.coupon_code)" size="100" level="H"></qrcode-vue>
+    <div class="promotiondetail-page">
+        <div class="promotion-card" v-if="promoDetail && promotion" ref="promo_card">
+            <div class="card-image">
+                <figure class="image" style="object-fit: cover;">
+                    <img v-if="promotion.imageUrl" :src="promotion.imageUrl">
+                </figure>
             </div>
-            <div class="code-detail">
-                <div class="promotion-code">
-                    Mã coupon: <br/><span>{{ promoDetail.coupon_code }}</span></div>
-                <div class="promotion-expired">Thời hạn sử dụng: <br/><b>{{ moment(promoDetail) }}</b></div>
+            <div class="promotion-code-detail">
+                <div class="qr-code">
+                    <qrcode-vue class="qrcode" :value="qrCodeRender(promoDetail.coupon_code)" size="100"
+                        level="H"></qrcode-vue>
+                </div>
+                <div class="code-detail">
+                    <div class="promotion-code">
+                        Mã coupon: <br /><span>{{ promoDetail.coupon_code }}</span></div>
+                    <div class="promotion-expired">Thời hạn sử dụng: <br /><b>{{ moment(promoDetail) }}</b></div>
+                </div>
             </div>
-        </div>
-        <!-- <div>
+            <!-- <div>
             <button class="pushable" @click="showPopup">
                 <span class="front">Hướng dẫn chụp màn hình điện thoại</span>
             </button>
         </div> -->
+        </div>
     </div>
 </template>
 <script>
 const API_URL = import.meta.env.VITE_APP_API_URL + '/api'
-const IMG_URL =  import.meta.env.VITE_APP_API_URL
+const IMG_URL = import.meta.env.VITE_APP_API_URL
 
 import moment from 'moment'
 import axios from 'axios'
@@ -68,17 +71,17 @@ export default {
 
         getPromotion(promotionId) {
             axios.get(`${API_URL}/promotions/${promotionId}?populate=*`)
-            .then(res => {
-                this.promotion = res.data.data.attributes
-                if (this.promotion.popup_img) {
-                    this.promotion.imageUrl = (IMG_URL + this.promotion.popup_img.data.attributes.url)
-                }
-                console.log(res);
-            })
-            .catch(err => {
-                console.log(err);
-                
-            })
+                .then(res => {
+                    this.promotion = res.data.data.attributes
+                    if (this.promotion.popup_img) {
+                        this.promotion.imageUrl = (IMG_URL + this.promotion.popup_img.data.attributes.url)
+                    }
+                    console.log(res);
+                })
+                .catch(err => {
+                    console.log(err);
+
+                })
         },
 
         moment(item) {
@@ -105,13 +108,20 @@ export default {
 }
 </script>
 <style lang="scss">
+.promotiondetail-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
 .promotion-card {
     position: relative;
     max-width: 500px;
     width: 100%;
     margin: 20px auto 0;
     padding: 10px;
-    margin-top: 60px;
+
     .promotion-code-detail {
         position: absolute;
         top: 30%;
@@ -122,33 +132,40 @@ export default {
         display: flex;
         margin: auto;
         max-width: 330px;
+
         .qr-code {
             flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
+
             .qrcode {
                 width: 100%;
                 text-align: center;
             }
         }
+
         .code-detail {
             width: 160px;
             font-size: 14px;
+
             .promotion-code {
                 span {
                     font-size: 16px;
                     font-weight: bold;
                 }
             }
+
             .promotion-expired {
                 font-size: 14px;
             }
         }
+
         @media (max-width: 450px) {
             top: 28%;
         }
     }
+
     .pushable {
         background-color: #013787;
         border-radius: 6px;

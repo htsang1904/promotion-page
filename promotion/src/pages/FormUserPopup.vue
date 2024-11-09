@@ -59,33 +59,41 @@
                 <div class="forminput">
                     <div class="title">
                         <b-icon pack="fas" icon="user" class="iconForm">
-                        </b-icon> Tên của bạn *
+                        </b-icon> Tên của bạn <span class="musthave">*</span>
                     </div>
                     <div class="inputcontainer">
-                        <input class="inputvalue" v-model="userName" type="text" placeholder="Nguyễn Văn A">
+                        <input class="inputvalue" v-model="userName" type="text" placeholder="Nhập tên người dùng">
                     </div>
                 </div>
                 <div class="forminput">
                     <div class="title"><b-icon pack="fas" icon="phone" class="iconForm">
-                        </b-icon> Số điện thoại *
+                        </b-icon> Số điện thoại <span class="musthave">*</span>
                     </div>
                     <div class="inputcontainer" @click="getphone">
                         <input type="number" onfocus="this.blur()" v-model="phoneNumber" class="inputvalue"
-                            placeholder="Ví dụ: 0912345678">
+                            placeholder="Bấm vào để cấp SĐT">
                     </div>
                 </div>
-                <div class="valuefooter">
-                    Theo dõi ngay Zalo OA Guta Cafe để nhận được nhiều thông báo ưu đãi hấp dẫn. *
+
+                <div v-if="followedOA === false">
+                    <div class="valuefooter">
+                        Theo dõi ngay Zalo OA Guta Cafe để nhận được nhiều thông báo ưu đãi hấp dẫn. <span
+                            class="musthave">*</span>
+                    </div>
+                    <div class="switchcontainer">
+                        <label class="switch" @click="followOfficialAccount()">
+                            <input type="checkbox" checked v-model="isSwitched">
+                            <span class="slider round"></span>
+                        </label><span v-if="isSwitched === false">Bấm để theo dõi OA</span><span
+                            v-if="isSwitched === true">Đã theo dõi OA</span>
+                    </div>
+                    <button class="btnsummit" v-if="isSwitched === true" @click="loginUser">Đăng ký ngay</button>
+                    <button class="btncannotsummit" v-if="isSwitched === false" @click="notFollowOa">Đăng ký
+                        ngay</button>
                 </div>
-                <div class="switchcontainer">
-                    <label class="switch" @click="followOfficialAccount()">
-                        <input type="checkbox" checked v-model="isSwitched">
-                        <span class="slider round"></span>
-                    </label><span v-if="isSwitched === true">Bấm để theo dõi OA</span><span
-                        v-if="isSwitched === false">Đã theo dõi OA</span>
+                <div v-else>
+                    <button class="btnsummit" @click="loginUser">Đăng ký ngay</button>
                 </div>
-                <button class="btnsummit" v-if="isSwitched === true" @click="loginUser">Đăng ký ngay</button>
-                <button class="btncannotsummit" v-if="isSwitched === false">Đăng ký ngay</button>
             </div>
         </div>
 
@@ -96,7 +104,7 @@
 const key = import.meta.env.SECRET_KEY
 const API_URL = import.meta.env.VITE_APP_API_URL
 import axios from 'axios';
-import { followOA, getUserInfo, getAccessToken, getPhoneNumber } from "zmp-sdk/apis";
+import { followOA, getUserInfo, getAccessToken, getPhoneNumber, authorize } from "zmp-sdk/apis";
 
 export default {
     components: {
@@ -106,12 +114,13 @@ export default {
             isSwitched: false,
             isSwitchedCustom: "Bấm để theo dõi",
             carousels: [],
-            userName: 'nam',
-            phoneNumber: '0976750578',
+            userName: '',
+            phoneNumber: '',
             userInfo: [],
             phoneToken: '',
             userAccessToken: '',
             avatar: '',
+            followedOA: false,
             islogin: false,
             followStatus: 'Đang kiểm tra...',
         }
@@ -151,7 +160,7 @@ export default {
                     headers: {
                         access_token: this.userAccessToken,
                         code: this.phoneToken,
-                        secret_key: 'Q6b3rDJB3gVe9nR6Uk5G'
+                        secret_key: 'efaxSTwfCHOVfK8HgO53'
                     }
                 })
                 if (userPhoneNumber.status === 200) {
@@ -160,14 +169,29 @@ export default {
                 }
             }
         },
+        // async getauthen(){
+        //     await authorize({
+        //         scopes: ["scope.userLocation", "scope.userPhonenumber"],
+        //         success: (data) => {
+        //             // xử lý khi gọi api thành công
+        //             console.log(data);
+        //             this.fetchUserInfo
+        //         },
+        //         fail: (error) => {
+        //             // xử lý khi gọi api thất bại
+        //             console.log(error);
+        //         },
+        //     });
+        // },
         async fetchUserInfo() {
             await getUserInfo({
-                success: (response) => {
-                    this.userInfo = response.userInfo;
-                    console.log(response);
+                success: (data) => {
+                    this.userInfo = data.userInfo;
+                    console.log(this.userInfo);
                     if (this.userInfo.name !== null) {
                         // this.userName = this.userInfo.name
                         this.avatar = this.userInfo.avatar
+                        this.followedOA = this.userInfo.followedOA
                         let userdata = localStorage.getItem('user')
                         if (userdata.length - 2 === 0) {
                             this.islogin = false
@@ -247,6 +271,7 @@ export default {
     background-color: white;
     box-sizing: border-box;
     margin-top: 60px;
+
     .headerPopup {
         height: 40px;
         align-content: center;
@@ -255,6 +280,10 @@ export default {
         font-weight: 600;
         background-color: white;
         box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    }
+
+    .musthave {
+        color: red;
     }
 
     .containerform {

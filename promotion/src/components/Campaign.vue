@@ -160,8 +160,22 @@ export default {
             if (userdata.length - 2 === 0) {
                 this.isCardModalActive = true
             } else {
+                this.checkhistory()
+            }
+        },
+
+        async checkhistory() {
+            let userdata = localStorage.getItem('user')
+            let user1 = JSON.parse(userdata)
+            console.log(user1[0].phone);
+            let phone = user1[0].phone
+            let now = moment().format('DD-MM-YYYY')
+            let dataHistory = await axios.get(`${API_URL}/checkpromotion-log?phone=${phone}&getdate=${now}`)
+            console.log(dataHistory);
+            if (dataHistory.status === 200) {
+                console.log(dataHistory.data.data.length);
                 let currentIndex = this.$refs.bottomFlicking.index
-                if (JSON.parse(localStorage.getItem('codes')).length >= 10) {
+                if (dataHistory.data.data.length >= 4) {
                     this.$buefy.notification.open({
                         duration: 2500,
                         message: `Số lần lấy mã hôm nay đã hết. </br>Hãy quay lại vào ngày mai nhé`,
@@ -179,11 +193,13 @@ export default {
                 this.isLoading = true
                 let user = localStorage.getItem('user')
                 let user1 = JSON.parse(user)
+                let now = moment().format('DD-MM-YYYY')
                 console.log(user1[0].phone);
                 let res = await axios.post(`${API_URL}/promotion-log/get-qr-code`, {
                     promotion_count: this.codeCountByPromotion(currentPromotion.id),
                     promotion_id: currentPromotion.id,
                     phone: user1[0].phone,
+                    getdate:now,
                     ...this.createRequestHash()
                 })
                 this.isLoading = false
@@ -266,12 +282,13 @@ export default {
 
 
 <style lang="scss">
-.containerbonus-page{
+.containerbonus-page {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
 }
+
 #bonus-page {
     display: flex;
     box-sizing: border-box;
@@ -279,7 +296,7 @@ export default {
     justify-items: center;
     align-items: center;
     width: 100%;
-    
+
     .bonus-banner {
         img {
             width: 100%;

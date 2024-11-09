@@ -62,9 +62,9 @@
       "type": "integer",
       "default": 1
     },
-    "promotion_log": {
+    "promotion_logs": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "oneToMany",
       "target": "api::promotion-log.promotion-log",
       "mappedBy": "promotion"
     }

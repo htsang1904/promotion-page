@@ -2,9 +2,9 @@
   "app": {
     "title": "promotion",
     "headerTitle": "promotion",
-    "headerColor": "#1843EF",
+    "headerColor": "#215AA8",
     "textColor": "white",
-    "statusBarColor": "#1843EF",
+    "statusBarColor": "#215AA8",
     "leftButton": "back",
     "statusBar": "normal",
     "actionBarHidden": true,
