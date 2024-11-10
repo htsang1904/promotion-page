@@ -175,7 +175,7 @@ export default {
             if (dataHistory.status === 200) {
                 console.log(dataHistory.data.data.length);
                 let currentIndex = this.$refs.bottomFlicking.index
-                if (dataHistory.data.data.length >= 4) {
+                if (dataHistory.data.data.length >= 5) {
                     this.$buefy.notification.open({
                         duration: 2500,
                         message: `Số lần lấy mã hôm nay đã hết. </br>Hãy quay lại vào ngày mai nhé`,

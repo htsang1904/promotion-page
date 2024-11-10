@@ -143,6 +143,7 @@ module.exports = createCoreController('api::promotion-log.promotion-log', ({
             },
             start: start,
             limit: limit,
+            sort: { createdAt: 'desc' },
         });
 
         // Lấy tổng số lượng bản ghi để tính toán phân trang
