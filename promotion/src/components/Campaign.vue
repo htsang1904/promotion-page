@@ -32,8 +32,7 @@
                         <div class="containerPopupLogin">
                             <img class="imgpopopuplogin" src="../assets/referral-bg.png" alt="">
                             <div class="containerTitleLogin">
-                                Để bạn có thể nhận quà Guta Cafe cần một số thông tin của bạn để có thể lưu giữ các mã
-                                giảm giá.
+                                Để bạn có thể nhận các mã giảm giá Guta Cafe bạn cần đăng nhập thành viên để dùng tính năng này.
                             </div>
                             <button class="btnlogin" @click="gotoFormPage">Đăng ký ngay</button>
                         </div>

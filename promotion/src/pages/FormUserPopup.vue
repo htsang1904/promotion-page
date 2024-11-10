@@ -1,6 +1,23 @@
 <template>
     <div class="Popup">
         <!-- <div class="headerPopup">Xác nhận thành viên</div> -->
+        <div v-if="islogin === false && isrepestUserModal === true">
+            <section>
+                <b-modal v-model="isrepestUserModal" width='80%' scroll="keep"  :canCancel="['escape']">
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="containerPopupLogin">
+                                <img class="imgpopopuplogin" src="../assets/referral-bg.png" alt="">
+                                <div class="containerTitleLogin">
+                                    Để bạn có thể nhận quà Guta Cafe cần một số thông tin của bạn để xác thực thông tin đăng ký.
+                                </div>
+                                <button class="btnlogin" @click="getauthen">Đã hiểu</button>
+                            </div>
+                        </div>
+                    </div>
+                </b-modal>
+            </section>
+        </div>
         <div v-if="islogin === true">
             <div class="containerdatauser">
                 <!-- <div class="backgroundHeader"></div> -->
@@ -105,17 +122,19 @@ const key = import.meta.env.SECRET_KEY
 const API_URL = import.meta.env.VITE_APP_API_URL
 import axios from 'axios';
 import { followOA, getUserInfo, getAccessToken, getPhoneNumber, authorize } from "zmp-sdk/apis";
+import RequestUserInfo from '../popup/RequestUserInfo.vue';
 
 export default {
     components: {
+        RequestUserInfo
     },
     data() {
         return {
             isSwitched: false,
             isSwitchedCustom: "Bấm để theo dõi",
             carousels: [],
-            userName: 'nam',
-            phoneNumber: '0976750578',
+            userName: '',
+            phoneNumber: '',
             userInfo: [],
             phoneToken: '',
             userAccessToken: '',
@@ -123,11 +142,12 @@ export default {
             followedOA: false,
             islogin: false,
             followStatus: 'Đang kiểm tra...',
+            isrepestUserModal:true
         }
     },
     mounted() {
         this.getPannerList()
-        this.fetchUserInfo()
+        // this.fetchUserInfo()
     },
     methods: {
         goToHome() {
@@ -169,27 +189,27 @@ export default {
                 }
             }
         },
-        // async getauthen(){
-        //     await authorize({
-        //         scopes: ["scope.userLocation", "scope.userPhonenumber"],
-        //         success: (data) => {
-        //             // xử lý khi gọi api thành công
-        //             console.log(data);
-        //             this.fetchUserInfo
-        //         },
-        //         fail: (error) => {
-        //             // xử lý khi gọi api thất bại
-        //             console.log(error);
-        //         },
-        //     });
-        // },
+        async getauthen() {
+            await authorize({
+                scopes: ["scope.userPhonenumber"],
+                success: (data) => {
+                    this.isrepestUserModal = false
+                    console.log(data);
+                    this.fetchUserInfo()
+                    this.getphone()
+                },
+                fail: (error) => {
+                    console.log(error);
+                },
+            });
+        },
         async fetchUserInfo() {
             await getUserInfo({
                 success: (data) => {
                     this.userInfo = data.userInfo;
                     console.log(this.userInfo);
                     if (this.userInfo.name !== null) {
-                        // this.userName = this.userInfo.name
+                        this.userName = this.userInfo.name
                         this.avatar = this.userInfo.avatar
                         this.followedOA = this.userInfo.followedOA
                         let userdata = localStorage.getItem('user')
