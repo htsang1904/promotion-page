@@ -25,8 +25,10 @@ export default {
 
     mounted() {
         localStorage.removeItem('user')
+        localStorage.removeItem('codes')
     },
     methods: {
+        
     }
 }
 </script>
@@ -51,5 +53,6 @@ body {
 
 #app-content {
     width: 100%;
+    overflow: hidden;
 }
 </style>

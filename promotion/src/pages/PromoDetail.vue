@@ -76,7 +76,6 @@ export default {
                     if (this.promotion.popup_img) {
                         this.promotion.imageUrl = (IMG_URL + this.promotion.popup_img.data.attributes.url)
                     }
-                    console.log(res);
                 })
                 .catch(err => {
                     console.log(err);

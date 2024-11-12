@@ -1,26 +1,30 @@
 <template>
     <transition name="slide-up">
-        <div class="popupcontainer">
-            <div class="header">
-                <div class="backgroundbackbtn" @click="closePopup">
-                    <b-icon class="backbtn" icon="xmark"></b-icon>
-                </div>
-            </div>
-            <div class="promotion-card" v-if="promoDetail" ref="promo_card">
-                <div class="card-image">
-                    <figure class="image" style="object-fit: cover;">
-                        <img v-if="promoDetail.promotion.popup_img.url" :src="url + promoDetail.promotion.popup_img.url">
-                    </figure>
-                </div>
-                <div class="promotion-code-detail">
-                    <div class="qr-code">
-                        <qrcode-vue class="qrcode" :value="qrCodeRender(promoDetail.coupon_code)" size="100"
-                            level="H"></qrcode-vue>
+        <div class="popupcontainer" @click.self="closePopup">
+            <div>
+                <div class="header" @click.self="closePopup">
+                    <div class="backgroundbackbtn" @click="closePopup">
+                        <b-icon class="backbtn" icon="xmark"></b-icon>
                     </div>
-                    <div class="code-detail">
-                        <div class="promotion-code">
-                            Mã coupon: <br /><span>{{ promoDetail.coupon_code }}</span></div>
-                        <div class="promotion-expired">Thời hạn sử dụng: <br /><b>{{ moment(promoDetail.promotion.deadline) }}</b>
+                </div>
+                <div class="promotion-card" v-if="promoDetail" ref="promo_card">
+                    <div class="card-image">
+                        <figure class="image" style="object-fit: cover;">
+                            <img v-if="promoDetail.promotion.popup_img.url"
+                                :src="url + promoDetail.promotion.popup_img.url">
+                        </figure>
+                    </div>
+                    <div class="promotion-code-detail">
+                        <div class="qr-code">
+                            <qrcode-vue class="qrcode" :value="qrCodeRender(promoDetail.coupon_code)" size="100"
+                                level="H"></qrcode-vue>
+                        </div>
+                        <div class="code-detail">
+                            <div class="promotion-code">
+                                Mã coupon: <br /><span>{{ promoDetail.coupon_code }}</span></div>
+                            <div class="promotion-expired">Thời hạn sử dụng: <br /><b>{{
+                                moment(promoDetail) }}</b>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -53,7 +57,7 @@ export default {
         return {
             promoDetail: null,
             promotion: null,
-            url:IMG_URL
+            url: IMG_URL
         }
     },
 
@@ -73,7 +77,6 @@ export default {
             axios.get(`${API_URL}/promotion-log/${this.coupon_code}`)
                 .then(res => {
                     this.promoDetail = res.data
-                    console.log(this.promoDetail);
                 })
                 .catch(err => {
                     console.log(err);
@@ -82,7 +85,7 @@ export default {
         },
 
         moment(item) {
-            return moment(item.createdAt).format('DD/MM') + ' - ' + moment(item.expire_at).format('DD/MM/YYYY')
+            return moment(item.createdAt).format('DD/MM') + ' - ' + moment(item.promotion.deadline).format('DD/MM/YYYY')
         },
 
         qrCodeRender(code) {
@@ -107,127 +110,119 @@ export default {
     z-index: 1000;
 
 
-.backgroundbackbtn {
-    position: fixed;
-    width: fit-content;
-    height: fit-content;
-    left: 0;
-}
-
-.backbtn {
-    height: 25px;
-    color: white;
-    margin-left: 10px;
-}
-
-
-
-.header {
-    position: fixed;
-    display: flex;
-    top: 0;
-    height: 60px;
-    width: 100%;
-    box-shadow: rgba(185, 185, 189, 0.2) 0px 7px 29px 0px;
-    z-index: 100;
-    align-items: center;
-    align-content: center;
-    justify-content: center;
-    box-sizing: border-box;
-    
-    .homelogo {
-        height: 20px;
-    }
-}
-
-.promotion-card {
-    position: relative;
-    max-width: 500px;
-    width: 100%;
-    margin: 20px auto 0;
-    padding: 10px;
-
-    .promotion-code-detail {
-        position: absolute;
-        top: 30%;
-        background: #fff;
-        border-radius: 4px;
+    .backgroundbackbtn {
+        position: fixed;
+        width: fit-content;
+        height: fit-content;
         left: 0;
-        right: 0;
+    }
+
+    .backbtn {
+        height: 25px;
+        color: white;
+        margin-left: 10px;
+    }
+
+
+
+    .header {
+        position: fixed;
         display: flex;
-        margin: auto;
-        max-width: 330px;
+        top: 0;
+        height: 60px;
+        width: 100%;
+        z-index: 100;
+        align-items: center;
+        align-content: center;
+        justify-content: center;
+        box-sizing: border-box;
 
-        .qr-code {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            .qrcode {
-                width: 100%;
-                text-align: center;
-            }
+        .homelogo {
+            height: 20px;
         }
+    }
 
-        .code-detail {
-            width: 160px;
-            font-size: 14px;
+    .promotion-card {
+        position: relative;
+        max-width: 500px;
+        width: 100%;
+        margin: 20px auto 0;
+        padding: 10px;
 
-            .promotion-code {
-                span {
-                    font-size: 16px;
-                    font-weight: bold;
+        .promotion-code-detail {
+            position: absolute;
+            top: 30%;
+            background: #fff;
+            border-radius: 4px;
+            left: 0;
+            right: 0;
+            display: flex;
+            margin: auto;
+            max-width: 330px;
+
+            .qr-code {
+                flex: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                .qrcode {
+                    width: 100%;
+                    text-align: center;
                 }
             }
 
-            .promotion-expired {
+            .code-detail {
+                width: 160px;
                 font-size: 14px;
+
+                .promotion-code {
+                    span {
+                        font-size: 16px;
+                        font-weight: bold;
+                    }
+                }
+
+                .promotion-expired {
+                    font-size: 14px;
+                }
+            }
+
+            @media (max-width: 450px) {
+                top: 28%;
             }
         }
 
-        @media (max-width: 450px) {
-            top: 28%;
+        .pushable {
+            background-color: #013787;
+            border-radius: 6px;
+            border: none;
+            margin-top: 14px;
+            padding: 0;
+            cursor: pointer;
+            outline-offset: 4px;
+            width: 100%;
+        }
+
+        .pushable:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        .front {
+            display: block;
+            padding: 10px 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: #034ab3;
+            color: white;
+            transform: translateY(-6px);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
+        }
+
+        .pushable:active .front {
+            transform: translateY(-2px);
         }
     }
-
-    .pushable {
-        background-color: #013787;
-        border-radius: 6px;
-        border: none;
-        margin-top: 14px;
-        padding: 0;
-        cursor: pointer;
-        outline-offset: 4px;
-        width: 100%;
-    }
-
-    .pushable:focus:not(:focus-visible) {
-        outline: none;
-    }
-
-    .front {
-        display: block;
-        padding: 10px 10px;
-        border-radius: 6px;
-        font-size: 14px;
-        background-color: #034ab3;
-        color: white;
-        transform: translateY(-6px);
-        font-family: 'Montserrat', sans-serif;
-        font-weight: bold;
-    }
-
-    .pushable:active .front {
-        transform: translateY(-2px);
-    }
-}}
-.slide-up-enter-active, .slide-up-leave-active {
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.slide-up-enter, .slide-up-leave-to /* .slide-up-leave-active in <2.1.8 */ {
-  transform: translateY(100%);
-  opacity: 0;
 }
 </style>

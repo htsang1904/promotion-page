@@ -75,7 +75,12 @@ export default {
 .default-link{
     color: gray;
 }
+.default-link:focus {
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
 .my-active-class{
     color: #215AA8
 }
+
 </style>

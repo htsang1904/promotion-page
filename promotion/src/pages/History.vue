@@ -3,28 +3,37 @@
         <CheckUserPopup v-if="islogin === false"/>
         <div class="containerHistory" v-if="islogin === true">
             <div class="titlehistoryheader">Quà của bạn</div>
-            <div v-for="(data, index) in historylist" :key="index">
-                <div class="historyItem" @click="checkUsingCoupon(data)">
-                    <div class="historycontainer1" v-if="data.promotion">
-                        <img class="imghistory" :src="bannerimg(data)" alt="">
-                    </div>
-                    <div class="historycontainer2">
-                        <div class="historytitle">Mã Coupon:</div>
-                        <div>{{ data.coupon_code }}</div>
-                        <div class="historytitle">Thời hạn sử dụng:</div>
-                        <div>{{ formatDate(data.promotion.deadline) }}</div>
+            <div v-if="checklisthistory === true" class="nogiftcontainer">
+                <img class="nogift" src="../assets/no-gift.png" alt="">
+                <div class="nogifttitle"><img class="nogiftimg" src="../assets/gift.png" alt=""> Bạn đang không có bất
+                    kỳ phần quà nào</div>
+            </div>
+            <div v-if="checklisthistory === false">
+                <div v-for="(data, index) in historylist" :key="index">
+                    <div class="historyItem" @click="checkUsingCoupon(data)">
+                        <div class="historycontainer1" v-if="data.promotion">
+                            <img class="imghistory" :src="bannerimg(data)" alt="">
+                        </div>
+                        <div class="historycontainer2">
+                            <div class="historytitle">Mã Coupon:</div>
+                            <div>{{ data.coupon_code }}</div>
+                            <div class="historytitle">Thời hạn sử dụng:</div>
+                            <div>{{ formatDate(data.promotion.deadline) }}</div>
+                        </div>
                     </div>
                 </div>
+                <div class="loadDataBtn" @click="nextpage" v-if="isLoadAll === false"><b-icon class="iconBtnLoadData"
+                        pack="fa" icon="circle-down"></b-icon> xem thêm</div>
+                <div class="loadDataBtn" v-if="isLoadAll === true">đã tải toàn bộ quà</div>
             </div>
-            <div class="loadDataBtn" @click="nextpage" v-if="isLoadAll === false" ><b-icon class="iconBtnLoadData" pack="fa" icon="circle-down"></b-icon> xem thêm</div>
-            <div class="loadDataBtn" v-if="isLoadAll === true" >đã tải toàn bộ quà</div>
         </div>
         <PromoLogPopup v-if="isOpenDetail" @closed="isOpenDetail = false" :coupon_code=coupon_code />
     </div>
 </template>
 
 <script>
-const API_URL = import.meta.env.VITE_APP_API_URL 
+const API_URL = import.meta.env.VITE_APP_API_URL
+const API_URL_GUTA = import.meta.env.VITE_APP_API_GUTA
 import axios from 'axios';
 import moment from 'moment';
 import CheckUserPopup from '../popup/CheckUserPopup.vue';
@@ -38,40 +47,41 @@ export default {
     data() {
         return {
             historylist: [],
-            pagination:[],
+            pagination: [],
             islogin: false,
-            page:1,
-            isLoadAll:false,
-            isOpenDetail:false,
-            coupon_code:'',
+            page: 1,
+            isLoadAll: false,
+            isOpenDetail: false,
+            coupon_code: '',
             url: API_URL,
+            checklisthistory: true,
         }
     },
     mounted() {
         this.gethistory()
     },
     methods: {
-        bannerimg(data){
+        bannerimg(data) {
             return this.url + data.promotion.banner_img.url
         },
-        async checkUsingCoupon(data){
-            let checkCoupon = await axios.get(`https://lab-gapi.guta.asia/webapi/public/coupon-child-checker?coupon_child_code=${data.coupon_code}&coupon_code=${data.scheme_code}`)
+        async checkUsingCoupon(data) {
+            let checkCoupon = await axios.get(`${API_URL_GUTA}/webapi/public/coupon-child-checker?coupon_child_code=${data.coupon_code}&coupon_code=${data.scheme_code}`)
             if (checkCoupon.data.coupon_child.is_used === 0) {
                 this.openCouponDetail(data.coupon_code)
-            }else{
+            } else {
                 this.$buefy.notification.open({
-                        duration: 2500,
-                        message: `Mã giảm giá này đã được dùng`,
-                        type: 'is-danger',
-                        position: 'is-top',
-                    })
+                    duration: 2500,
+                    message: `Mã giảm giá này đã được dùng`,
+                    type: 'is-danger',
+                    position: 'is-top',
+                })
             }
         },
-        openCouponDetail(code){
+        openCouponDetail(code) {
             this.coupon_code = code
             this.isOpenDetail = true
         },
-        nextpage(){
+        nextpage() {
             this.page = this.pagination.page + 1
             this.gethistory()
         },
@@ -82,18 +92,16 @@ export default {
             } else {
                 this.islogin = true
                 let user1 = JSON.parse(userdata)
-                console.log(user1[0].phone);
                 let phone = user1[0].phone
                 let dataHistory = await axios.get(`${API_URL}/api/promotion-log?phone=${phone}&page=${this.page}&pageSize=5`)
-                console.log(dataHistory);
                 if (dataHistory.status === 200) {
                     this.historylist.push(...dataHistory.data.data)
-                    console.log(this.historylist);
                     this.pagination = dataHistory.data.pagination
-                    if (this.historylist.length === this.pagination.totalItems ) {
+                    if (this.historylist.length === this.pagination.totalItems) {
                         this.isLoadAll = true
-                        console.log(this.isLoadAll);
-                        
+                        if (this.historylist.length !== 0) {
+                            this.checklisthistory = false
+                        }
                     }
                 }
             }
@@ -108,15 +116,45 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.containerHistory1{
+.slide-up-enter-active,
+.slide-up-leave-active {
+    transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.slide-up-enter,
+.slide-up-leave-to {
+    transform: translateY(100%);
+    opacity: 0;
+}
+.nogiftcontainer {
+    text-align: center;
+    align-items: center;
+}
+
+.nogift {
+    width: 80%;
+}
+
+.nogifttitle {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.nogiftimg {
+    width: 20px;
+}
+
+.containerHistory1 {
     display: flex;
     height: 100vh;
 }
+
 .containerHistory {
     width: 100%;
     height: 100%;
     padding: 10px;
-    margin-top: 60px;
+    margin-top: 50px;
+
     .titlehistoryheader {
         font-size: 14px;
         font-weight: 600;
@@ -157,14 +195,16 @@ export default {
     .imghistory {
         width: 100%;
     }
-    .loadDataBtn{
+
+    .loadDataBtn {
         display: flex;
         font-size: 14px;
         font-weight: 500;
         justify-content: center;
         align-items: center;
         height: 40px;
-        .iconBtnLoadData{
+
+        .iconBtnLoadData {
             width: 16px;
             height: 16px;
             margin-right: 5px;

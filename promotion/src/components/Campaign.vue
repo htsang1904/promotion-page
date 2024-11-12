@@ -1,6 +1,11 @@
 <template>
     <div class="containerbonus-page">
-        <div id="bonus-page">
+        <div v-if="checklisthistory === true" class="nogiftcontainer">
+            <img class="nogift" src="../assets/no-gift.png" alt="">
+            <div class="nogifttitle"><img class="nogiftimg" src="../assets/gift.png" alt=""> Không có chương trình giảm
+                giá nào đang diễn ra</div>
+        </div>
+        <div id="bonus-page" v-if="checklisthistory === false">
             <Flicking v-if="topBanners.length" ref="topFlicking" class="top-slider" :options="topOption"
                 :plugins="topPlugins">
                 <div class="flicking-panel" v-for="(banner, index) in topBanners" :key="index">
@@ -32,7 +37,8 @@
                         <div class="containerPopupLogin">
                             <img class="imgpopopuplogin" src="../assets/referral-bg.png" alt="">
                             <div class="containerTitleLogin">
-                                Để bạn có thể nhận các mã giảm giá Guta Cafe bạn cần đăng nhập thành viên để dùng tính năng này.
+                                Để bạn có thể nhận các mã giảm giá Guta Cafe bạn cần đăng nhập thành viên để dùng tính
+                                năng này.
                             </div>
                             <button class="btnlogin" @click="gotoFormPage">Đăng ký ngay</button>
                         </div>
@@ -48,12 +54,12 @@
 <script>
 const SALTKEY = '8Q21kHR0KJ';
 const API_URL = import.meta.env.VITE_APP_API_URL + '/api'
-console.log(API_URL);
 
 import axios from 'axios';
 import moment from 'moment';
 import DeviceDetector from "device-detector-js";
 import md5 from 'js-md5'
+import { getSetting, getUserInfo, getAccessToken, getPhoneNumber } from "zmp-sdk/apis";
 
 import {
     AutoPlay,
@@ -90,7 +96,16 @@ export default {
                 defaultIndex: 1,
                 inputType: ["pointer"],
             },
-            isCardModalActive: false
+            isCardModalActive: false,
+            checklisthistory: true,
+            userName: '',
+            phoneNumber: '',
+            avatar: '',
+            userInfo: [],
+            userAccessToken: '',
+            phoneToken: '',
+            promotionList: [],
+            historyList: []
         };
     },
 
@@ -109,7 +124,6 @@ export default {
         },
         img(url) {
             console.log(this.$options.filters.imgUrl(url));
-
         },
         getDeviceInfo() {
             let deviceDetector = new DeviceDetector();
@@ -137,14 +151,17 @@ export default {
             }
             if (localStorage.getItem('user') === null) {
                 localStorage.setItem('user', JSON.stringify([]))
+                this.getSettings()
             }
             if (localStorage.getItem('avatar') === null) {
                 localStorage.setItem('avatar', JSON.stringify([]))
             }
             if (promoData && promoData.data) {
-                let promotionList = promoData.data
-                console.log(promotionList);
-                promotionList.forEach(promotion => {
+                this.promotionList = promoData.data
+                if (this.promotionList.length !== 0) {
+                    this.checklisthistory = false
+                }
+                this.promotionList.forEach(promotion => {
                     if (promotion.position === 'top') {
                         this.topBanners.push(promotion)
                     } else {
@@ -155,37 +172,36 @@ export default {
         },
 
         onClickReceiveButton() {
+            let currentIndex = this.$refs.bottomFlicking.index
             let userdata = localStorage.getItem('user')
             if (userdata.length - 2 === 0) {
                 this.isCardModalActive = true
             } else {
-                this.checkhistory()
+                this.getPromoCode(this.bottomBanners[currentIndex])
             }
         },
 
-        async checkhistory() {
-            let userdata = localStorage.getItem('user')
-            let user1 = JSON.parse(userdata)
-            console.log(user1[0].phone);
-            let phone = user1[0].phone
-            let now = moment().format('DD-MM-YYYY')
-            let dataHistory = await axios.get(`${API_URL}/checkpromotion-log?phone=${phone}&getdate=${now}`)
-            console.log(dataHistory);
-            if (dataHistory.status === 200) {
-                console.log(dataHistory.data.data.length);
-                let currentIndex = this.$refs.bottomFlicking.index
-                if (dataHistory.data.data.length >= 5) {
-                    this.$buefy.notification.open({
-                        duration: 2500,
-                        message: `Số lần lấy mã hôm nay đã hết. </br>Hãy quay lại vào ngày mai nhé`,
-                        type: 'is-danger',
-                        position: 'is-top',
-                    })
-                } else {
-                    this.getPromoCode(this.bottomBanners[currentIndex])
-                }
-            }
-        },
+        // async checkhistory() {
+        //     let userdata = localStorage.getItem('user')
+        //     let user1 = JSON.parse(userdata)
+        //     let phone = user1[0].phone
+        //     let now = moment().format('DD-MM-YYYY')
+        //     let dataHistory = await axios.get(`${API_URL}/checkpromotion-log?phone=${phone}&getdate=${now}`)
+        //     if (dataHistory.status === 200) {
+        //         this.historyList = dataHistory.data.data
+        //         let currentIndex = this.$refs.bottomFlicking.index
+        //         // if (dataHistory.data.data.length >= this.promotionList.length) {
+        //         //     this.$buefy.notification.open({
+        //         //         duration: 2500,
+        //         //         message: `Số lần lấy mã hôm nay đã hết. </br>Hãy quay lại vào ngày mai nhé`,
+        //         //         type: 'is-danger',
+        //         //         position: 'is-top',
+        //         //     })
+        //         // } else {
+        //             this.getPromoCode(this.bottomBanners[currentIndex])
+
+        //     }
+        // },
 
         async getPromoCode(currentPromotion) {
             try {
@@ -193,12 +209,11 @@ export default {
                 let user = localStorage.getItem('user')
                 let user1 = JSON.parse(user)
                 let now = moment().format('DD-MM-YYYY')
-                console.log(user1[0].phone);
                 let res = await axios.post(`${API_URL}/promotion-log/get-qr-code`, {
                     promotion_count: this.codeCountByPromotion(currentPromotion.id),
                     promotion_id: currentPromotion.id,
                     phone: user1[0].phone,
-                    getdate:now,
+                    getdate: now,
                     ...this.createRequestHash()
                 })
                 this.isLoading = false
@@ -206,13 +221,9 @@ export default {
                     if (res.data.success) {
                         let result = res.data
                         this.coupon_code = result.data.coupon_code
-                        // this.qrCode = result.data.coupon_code
-                        // if (currentPromotion.popup_img) {
-                        //     this.imageUrl = (IMG_URL + currentPromotion.popup_img.url)
-                        // }
-                        // this.promotionDeadline = result.data.expire_at
-                        // this.showPromotionCodeModal = true
                         this.saveToLocalstorage(result.data, currentPromotion.id)
+                        console.log(result);
+
                         this.$router.push('/nhan-uu-dai')
                     } else {
                         this.$buefy.notification.open({
@@ -233,6 +244,7 @@ export default {
                     position: 'is-top',
                 })
             }
+
         },
 
         clearLocalstorage() {
@@ -274,13 +286,111 @@ export default {
             this.showPromotionCodeModal = false
         },
 
-
+        async getSettings() {
+            let userdata = localStorage.getItem('user')
+            if (userdata.length - 2 === 0) {
+                try {
+                    const data = await getSetting({});
+                    console.log(data);
+                    console.log(data.authSetting['scope.userInfo']);
+                    if (data.authSetting['scope.userInfo'] === true && data.authSetting['scope.userPhonenumber'] === true) {
+                        this.fetchUserInfo()
+                    }
+                } catch (error) {
+                    // xử lý khi gọi api thất bại
+                    console.log(error);
+                }
+            }
+        },
+        async loginUser() {
+            let userData = await axios.post(`${API_URL}/auth/login`, {
+                name: this.userName,
+                phone: this.phoneNumber
+            });
+            if (userData.status === 200) {
+                this.dataUser = userData.data
+                localStorage.setItem('user', JSON.stringify([this.dataUser]))
+            }
+        },
+        async fetchUserInfo() {
+            await getUserInfo({
+                success: (data) => {
+                    this.userInfo = data.userInfo;
+                    if (this.userInfo.name !== null) {
+                        this.userName = this.userInfo.name
+                        this.avatar = this.userInfo.avatar
+                        this.followedOA = this.userInfo.followedOA
+                        localStorage.setItem('avatar', JSON.stringify(this.userInfo.avatar))
+                        this.getphone()
+                    }
+                },
+                fail: (error) => {
+                    console.error('Lỗi khi lấy thông tin người dùng:', error);
+                },
+            });
+        },
+        async getuserToken() {
+            try {
+                const accessToken = await getAccessToken({});
+                this.userAccessToken = accessToken
+                this.getphonenumber()
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        async getphone() {
+            await getPhoneNumber({
+                success: async (data) => {
+                    this.phoneToken = data.token;
+                    this.getuserToken()
+                },
+                fail: (error) => {
+                    console.log(error);
+                }
+            });
+        },
+        async getphonenumber() {
+            if (this.userAccessToken !== null && this.phoneToken !== null) {
+                let userPhoneNumber = await axios.get('https://graph.zalo.me/v2.0/me/info', {
+                    headers: {
+                        access_token: this.userAccessToken,
+                        code: this.phoneToken,
+                        secret_key: 'efaxSTwfCHOVfK8HgO53'
+                    }
+                })
+                if (userPhoneNumber.status === 200) {
+                    this.phoneNumber = userPhoneNumber.data.data.number
+                    this.loginUser()
+                }
+            }
+        },
     },
 }
 </script>
 
 
 <style lang="scss">
+.nogiftcontainer {
+    text-align: center;
+    align-items: center;
+
+    .nogift {
+        width: 80%;
+    }
+
+    .nogifttitle {
+        padding-left: 5%;
+        padding-right: 5%;
+        font-size: 16px;
+        font-weight: 600;
+
+    }
+
+    .nogiftimg {
+        width: 20px;
+    }
+}
+
 .containerbonus-page {
     display: flex;
     justify-content: center;

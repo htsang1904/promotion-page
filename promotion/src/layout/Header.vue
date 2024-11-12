@@ -1,6 +1,6 @@
 <template>
     <div class="header">
-        <img class="homelogo" src="../assets/home-logo.png" alt="">
+        <img class="homelogo" src="../assets/guta-voucher-logo.png" @click="gotohome" alt="">
     </div>
 </template>
 
@@ -21,6 +21,9 @@ export default {
     },
 
     methods: {
+        gotohome(){
+            this.$router.push('/')
+        }
     }
 }
 </script>
@@ -29,7 +32,7 @@ export default {
 .header {
     position: fixed;
     top: 0;
-    height: 60px;
+    height: 50px;
     width: 100%;
     box-shadow: rgba(185, 185, 189, 0.2) 0px 7px 29px 0px;
     z-index: 100;
@@ -39,8 +42,8 @@ export default {
     box-sizing: border-box;
 
     .homelogo {
-        height: 20px;
-        margin-left: 10px;
+        height: 25px;
+        margin-left: 5px;
     }
 }
 </style>

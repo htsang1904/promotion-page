@@ -1,23 +1,6 @@
 <template>
     <div class="Popup">
         <!-- <div class="headerPopup">Xác nhận thành viên</div> -->
-        <div v-if="islogin === false && isrepestUserModal === true">
-            <section>
-                <b-modal v-model="isrepestUserModal" width='80%' scroll="keep"  :canCancel="['escape']">
-                    <div class="card">
-                        <div class="card-content">
-                            <div class="containerPopupLogin">
-                                <img class="imgpopopuplogin" src="../assets/referral-bg.png" alt="">
-                                <div class="containerTitleLogin">
-                                    Để bạn có thể nhận quà Guta Cafe cần một số thông tin của bạn để xác thực thông tin đăng ký.
-                                </div>
-                                <button class="btnlogin" @click="getauthen">Đã hiểu</button>
-                            </div>
-                        </div>
-                    </div>
-                </b-modal>
-            </section>
-        </div>
         <div v-if="islogin === true">
             <div class="containerdatauser">
                 <!-- <div class="backgroundHeader"></div> -->
@@ -33,7 +16,7 @@
                         <img class="imggift" src="../assets/gift.png" alt="">
                     </div>
                 </div>
-                <b-carousel :indicator="false">
+                <!-- <b-carousel :indicator="false">
                     <b-carousel-item v-for="(carousel, i) in carousels" :key="i">
                         <section class="hero is-medium">
                             <div>
@@ -41,7 +24,14 @@
                             </div>
                         </section>
                     </b-carousel-item>
-                </b-carousel>
+                </b-carousel> -->
+                <div class="chatcontainer">
+                    <div class="chatinfo">
+                        <img class="imgbtnoa" src="../assets/home-logo.png" alt="">
+                        <div class="titlebtnoa">Nhắn tin Zalo cho Guta Cafe</div>
+                        <button class="btnchatbox" @click="openChatScreen">Nhắn tin cho Guta</button>
+                    </div>
+                </div>
                 <div class="containermess">
                     <div>
                         <img class="imgconrat" src="../assets/congrat.png" alt="">
@@ -59,7 +49,7 @@
             </div>
         </div>
         <div v-if="islogin === false">
-            <b-carousel :indicator="false">
+            <!-- <b-carousel :indicator="false">
                 <b-carousel-item v-for="(carousel, i) in carousels" :key="i">
                     <section class="hero is-medium">
                         <div>
@@ -67,7 +57,7 @@
                         </div>
                     </section>
                 </b-carousel-item>
-            </b-carousel>
+            </b-carousel> -->
             <div class="titleheaderform">
                 <img class="logoiconandroid" src="../assets/open-gift.png" alt=""> Đăng ký thành viên để có thể nhận
                 ngay các mã voucher giảm giá đến từ Guta Cafe nhé!
@@ -78,8 +68,9 @@
                         <b-icon pack="fas" icon="user" class="iconForm">
                         </b-icon> Tên của bạn <span class="musthave">*</span>
                     </div>
-                    <div class="inputcontainer">
-                        <input class="inputvalue" v-model="userName" type="text" placeholder="Nhập tên người dùng">
+                    <div class="inputcontainer" @click="openmodleauthen">
+                        <input class="inputvalue" onfocus="this.blur()" v-model="userName" type="text"
+                            placeholder="Nhập tên người dùng">
                     </div>
                 </div>
                 <div class="forminput">
@@ -113,7 +104,22 @@
                 </div>
             </div>
         </div>
-
+        <section>
+            <b-modal v-model="isrepestUserModal" width='80%' scroll="keep" :canCancel="['escape']">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="containerPopupLogin">
+                            <img class="imgpopopuplogin" src="../assets/referral-bg.png" alt="">
+                            <div class="containerTitleLogin">
+                                Để bạn có thể nhận quà Guta Cafe cần một số thông tin của bạn để xác thực thông
+                                tin đăng ký.
+                            </div>
+                            <button class="btnlogin" @click="getauthen">Đã hiểu</button>
+                        </div>
+                    </div>
+                </div>
+            </b-modal>
+        </section>
     </div>
 </template>
 
@@ -121,7 +127,7 @@
 const key = import.meta.env.SECRET_KEY
 const API_URL = import.meta.env.VITE_APP_API_URL
 import axios from 'axios';
-import { followOA, getUserInfo, getAccessToken, getPhoneNumber, authorize } from "zmp-sdk/apis";
+import { followOA, getUserInfo, getAccessToken, getPhoneNumber, authorize, openChat } from "zmp-sdk/apis";
 import RequestUserInfo from '../popup/RequestUserInfo.vue';
 
 export default {
@@ -142,14 +148,40 @@ export default {
             followedOA: false,
             islogin: false,
             followStatus: 'Đang kiểm tra...',
-            isrepestUserModal:true
+            isrepestUserModal: false,
+            userid: ''
         }
     },
     mounted() {
         this.getPannerList()
         // this.fetchUserInfo()
+        this.checkIsLogin()
     },
     methods: {
+        async openChatScreen() {
+            try {
+                await openChat({
+                    type: "oa",
+                    id: "4079940346853184898",
+                    message: "Xin Chào",
+                });
+            } catch (error) {
+                // xử lý khi gọi api thất bại
+                console.log(error);
+            }
+        },
+        checkIsLogin() {
+            let userdata = localStorage.getItem('user')
+            if (userdata.length - 2 === 0) {
+                this.islogin = false
+            } else {
+                this.islogin = true
+                this.fetchUserInfo()
+            }
+        },
+        openmodleauthen() {
+            this.isrepestUserModal = true
+        },
         goToHome() {
             this.$router.push('/')
         },
@@ -166,7 +198,6 @@ export default {
             await getPhoneNumber({
                 success: async (data) => {
                     this.phoneToken = data.token;
-                    console.log('phoneToken', data);
                     this.getuserToken()
                 },
                 fail: (error) => {
@@ -185,7 +216,6 @@ export default {
                 })
                 if (userPhoneNumber.status === 200) {
                     this.phoneNumber = userPhoneNumber.data.data.number
-                    console.log('phoneNumber', this.phoneNumber);
                 }
             }
         },
@@ -194,7 +224,6 @@ export default {
                 scopes: ["scope.userPhonenumber"],
                 success: (data) => {
                     this.isrepestUserModal = false
-                    console.log(data);
                     this.fetchUserInfo()
                     this.getphone()
                 },
@@ -207,18 +236,19 @@ export default {
             await getUserInfo({
                 success: (data) => {
                     this.userInfo = data.userInfo;
-                    console.log(this.userInfo);
                     if (this.userInfo.name !== null) {
                         this.userName = this.userInfo.name
                         this.avatar = this.userInfo.avatar
                         this.followedOA = this.userInfo.followedOA
+                        this.userid = this.userInfo.id
+                        console.log(this.userInfo);
                         let userdata = localStorage.getItem('user')
                         if (userdata.length - 2 === 0) {
                             this.islogin = false
                         } else {
                             this.islogin = true
                         }
-                        localStorage.setItem('avatar', JSON.stringify(response.userInfo.avatar))
+                        localStorage.setItem('avatar', JSON.stringify(data.userInfo.avatar))
                     }
                 },
                 fail: (error) => {
@@ -249,7 +279,6 @@ export default {
             if (pannerData.status === 200) {
                 this.carousels = pannerData.data.campaigns.items
             }
-            console.log(pannerData);
 
         },
         async loginUser() {
@@ -267,8 +296,6 @@ export default {
                     localStorage.setItem('user', JSON.stringify([this.dataUser]))
                     this.$router.push('/')
                 }
-                console.log(userData);
-
             }
         },
         notFollowOa() {
@@ -290,7 +317,7 @@ export default {
     width: 100vw;
     background-color: white;
     box-sizing: border-box;
-    margin-top: 60px;
+    margin-top: 50px;
 
     .headerPopup {
         height: 40px;
@@ -485,7 +512,6 @@ input:checked+.slider:before {
 
         .containerTitle {
             align-content: center;
-            border-left: 1px solid #797979;
         }
 
         .logoiconandroid {
@@ -519,6 +545,47 @@ input:checked+.slider:before {
         .imggift {
             width: 20px;
             height: 20px;
+        }
+    }
+
+    .chatcontainer {
+        width: 100%;
+        padding: 10px;
+        height: 80px;
+
+        .chatinfo {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            background-color: #215AA8;
+            border-radius: 5px;
+            padding: 10px;
+
+            .imgbtnoa {
+                width: 20%;
+            }
+
+            .titlebtnoa {
+                width: 40%;
+                color: #fff;
+                font-size: 12px;
+                font-weight: 600;
+                padding-left: 10px;
+                padding-right: 5px;
+                text-align: left;
+            }
+
+            .btnchatbox {
+                width: 40%;
+                background-color: rgb(248, 116, 0);
+                border: 2px solid orange;
+                border-radius: 5px;
+                color: #fff;
+                font-size: 12px;
+                font-weight: 600;
+                padding: 5px;
+            }
         }
     }
 
