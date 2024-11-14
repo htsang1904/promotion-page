@@ -105,7 +105,7 @@
             </div>
         </div>
         <section>
-            <b-modal v-model="isrepestUserModal" width='80%' scroll="keep" :canCancel="['escape']">
+            <b-modal v-model="isrepestUserModal" width='80%' scroll="keep" >
                 <div class="card">
                     <div class="card-content">
                         <div class="containerPopupLogin">
@@ -139,8 +139,8 @@ export default {
             isSwitched: false,
             isSwitchedCustom: "Bấm để theo dõi",
             carousels: [],
-            userName: '',
-            phoneNumber: '',
+            userName: 'nam',
+            phoneNumber: '0976750578',
             userInfo: [],
             phoneToken: '',
             userAccessToken: '',
@@ -237,7 +237,7 @@ export default {
                 success: (data) => {
                     this.userInfo = data.userInfo;
                     if (this.userInfo.name !== null) {
-                        this.userName = this.userInfo.name
+                        // this.userName = this.userInfo.name
                         this.avatar = this.userInfo.avatar
                         this.followedOA = this.userInfo.followedOA
                         this.userid = this.userInfo.id
@@ -293,6 +293,8 @@ export default {
                 });
                 if (userData.status === 200) {
                     this.dataUser = userData.data
+                    console.log(this.dataUser);
+                    
                     localStorage.setItem('user', JSON.stringify([this.dataUser]))
                     this.$router.push('/')
                 }

@@ -54,7 +54,7 @@ export default {
             isOpenDetail: false,
             coupon_code: '',
             url: API_URL,
-            checklisthistory: true,
+            checklisthistory: false,
         }
     },
     mounted() {
@@ -99,8 +99,8 @@ export default {
                     this.pagination = dataHistory.data.pagination
                     if (this.historylist.length === this.pagination.totalItems) {
                         this.isLoadAll = true
-                        if (this.historylist.length !== 0) {
-                            this.checklisthistory = false
+                        if (this.historylist.length === 0) {
+                            this.checklisthistory = true
                         }
                     }
                 }

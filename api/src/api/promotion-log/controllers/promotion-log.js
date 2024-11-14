@@ -57,12 +57,30 @@ module.exports = createCoreController('api::promotion-log.promotion-log', ({
             }
           }
         }
-        if (promotionDetail.limit_per_user && request.promotion_count && request.promotion_count >= promotionDetail.limit_per_user) {
+        if (promotionDetail.limit_per_user > 0) {
+          let today = new Date()
+          let todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+          let todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1)
+          let promotionLogCountUser = await strapi.entityService.count('api::promotion-log.promotion-log', {
+            populate: ['promotion'],
+            filters: {
+              phone:request.phone,
+              promotion: {
+                id: request.promotion_id
+              },
+              created_at: {
+                $gte: todayStart,
+                $lt: todayEnd
+              },
+            }
+          })
+        if (promotionLogCountUser >= promotionDetail.limit_per_user) {
           return {
             success: false,
             message: 'Bạn đã sử dụng hết lượt khuyến mãi hôm nay, hãy thử lại vào ngày mai'
           }
         }
+      }
 
         let platformEndpoint = strapi.config.get('platform.endpoint') + '/webapi/create_qr_code'
         let data = {
