@@ -85,7 +85,7 @@ export default {
         },
 
         moment(item) {
-            return moment(item.createdAt).format('DD/MM') + ' - ' + moment(item.promotion.deadline).format('DD/MM/YYYY')
+            return moment(item.createdAt).format('DD/MM') + ' - ' + moment(item.expire_at).format('DD/MM/YYYY')
         },
 
         qrCodeRender(code) {

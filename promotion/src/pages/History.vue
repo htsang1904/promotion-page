@@ -18,7 +18,7 @@
                             <div class="historytitle">Mã Coupon:</div>
                             <div>{{ data.coupon_code }}</div>
                             <div class="historytitle">Thời hạn sử dụng:</div>
-                            <div>{{ formatDate(data.promotion.deadline) }}</div>
+                            <div>{{ formatDate(data.expire_at) }}</div>
                         </div>
                     </div>
                 </div>

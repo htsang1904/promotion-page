@@ -139,8 +139,8 @@ export default {
             isSwitched: false,
             isSwitchedCustom: "Bấm để theo dõi",
             carousels: [],
-            userName: 'nam',
-            phoneNumber: '0976750578',
+            userName: 'Nam',
+            phoneNumber: '84976750578',
             userInfo: [],
             phoneToken: '',
             userAccessToken: '',
@@ -237,7 +237,7 @@ export default {
                 success: (data) => {
                     this.userInfo = data.userInfo;
                     if (this.userInfo.name !== null) {
-                        // this.userName = this.userInfo.name
+                        this.userName = this.userInfo.name
                         this.avatar = this.userInfo.avatar
                         this.followedOA = this.userInfo.followedOA
                         this.userid = this.userInfo.id

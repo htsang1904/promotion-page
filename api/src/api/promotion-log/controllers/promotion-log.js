@@ -149,10 +149,12 @@ module.exports = createCoreController('api::promotion-log.promotion-log', ({
         const currentPage = parseInt(page, 10);
         const limit = parseInt(pageSize, 10);
         const start = (currentPage - 1) * limit; // Vị trí bắt đầu dựa trên trang hiện tại và số lượng trên mỗi trang
-
+        const now = new Date();
         const promotionList = await strapi.entityService.findMany('api::promotion-log.promotion-log', {
             filters: {
-                phone: phone ? { $eq: phone } : undefined, isActive: true
+                phone: phone ? { $eq: phone } : undefined, 
+                isActive: true,
+                expire_at: { $gte: now } 
             },
             populate:{
               promotion: {
@@ -167,7 +169,7 @@ module.exports = createCoreController('api::promotion-log.promotion-log', ({
         // Lấy tổng số lượng bản ghi để tính toán phân trang
         const totalItems = await strapi.entityService.count('api::promotion-log.promotion-log', {
             filters: {
-                phone: phone ? { $eq: phone } : undefined,
+                phone: phone ? { $eq: phone } : undefined,expire_at: { $gte: now } 
             },
         });
 
