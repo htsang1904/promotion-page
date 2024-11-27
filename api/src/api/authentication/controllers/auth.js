@@ -1,7 +1,7 @@
 // src/api/user/controllers/custom-login.js
 module.exports ={
   async login(ctx) {
-    const { name, phone } = ctx.request.body;
+    const { name, phone ,zlid } = ctx.request.body;
 
     if (!name || !phone) {
       return ctx.badRequest('Name and phone number are required');
@@ -13,10 +13,20 @@ module.exports ={
       });
 
       if (existingUser && existingUser.length > 0) {
-        return ctx.send(existingUser[0]);
+        if (existingUser[0].zlid !== null) {
+          return ctx.send(existingUser[0]);
+        }else{
+          const updatedUser = await strapi.entityService.update(
+            'api::authuser.authuser',
+            existingUser[0].id,
+            { data: { zlid } }
+        );
+        return ctx.send(updatedUser);
+        }
+        
       } else {
         const newUser = await strapi.entityService.create('api::authuser.authuser', {
-          data: { name, phone }
+          data: { name, phone, zlid }
         });
 
         return ctx.send(newUser);

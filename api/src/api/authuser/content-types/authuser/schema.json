@@ -4,7 +4,8 @@
   "info": {
     "singularName": "authuser",
     "pluralName": "authusers",
-    "displayName": "Authuser"
+    "displayName": "Authuser",
+    "description": ""
   },
   "options": {
     "draftAndPublish": false
@@ -23,6 +24,12 @@
       "relation": "oneToMany",
       "target": "api::promotion-log.promotion-log",
       "mappedBy": "authuser"
+    },
+    "zlid": {
+      "type": "text"
+    },
+    "platformUserId": {
+      "type": "text"
     }
   }
 }

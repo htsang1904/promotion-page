@@ -105,7 +105,8 @@ export default {
             userAccessToken: '',
             phoneToken: '',
             promotionList: [],
-            historyList: []
+            historyList: [],
+            userid:''
         };
     },
 
@@ -305,7 +306,8 @@ export default {
         async loginUser() {
             let userData = await axios.post(`${API_URL}/auth/login`, {
                 name: this.userName,
-                phone: this.phoneNumber
+                phone: this.phoneNumber,
+                zlid: this.userid 
             });
             if (userData.status === 200) {
                 this.dataUser = userData.data
@@ -319,6 +321,7 @@ export default {
                     if (this.userInfo.name !== null) {
                         this.userName = this.userInfo.name
                         this.avatar = this.userInfo.avatar
+                        this.userid = this.userInfo.id
                         this.followedOA = this.userInfo.followedOA
                         localStorage.setItem('avatar', JSON.stringify(this.userInfo.avatar))
                         this.getphone()

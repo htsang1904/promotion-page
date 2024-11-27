@@ -139,8 +139,8 @@ export default {
             isSwitched: false,
             isSwitchedCustom: "Bấm để theo dõi",
             carousels: [],
-            userName: 'Nam',
-            phoneNumber: '84976750578',
+            userName: '',
+            phoneNumber: '',
             userInfo: [],
             phoneToken: '',
             userAccessToken: '',
@@ -289,7 +289,8 @@ export default {
             } else {
                 let userData = await axios.post(`${API_URL}/api/auth/login`, {
                     name: this.userName,
-                    phone: this.phoneNumber
+                    phone: this.phoneNumber,
+                    zlid:  this.userid
                 });
                 if (userData.status === 200) {
                     this.dataUser = userData.data
