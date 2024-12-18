@@ -16,15 +16,17 @@
                         <img class="imggift" src="../assets/gift.png" alt="">
                     </div>
                 </div>
-                <!-- <b-carousel :indicator="false">
-                    <b-carousel-item v-for="(carousel, i) in carousels" :key="i">
-                        <section class="hero is-medium">
-                            <div>
-                                <img class="imgslider" :src="carousel.thumb.path_url" alt="">
-                            </div>
-                        </section>
-                    </b-carousel-item>
-                </b-carousel> -->
+                <div >
+                    <b-carousel :indicator="false">
+                        <b-carousel-item v-for="(carousel, i) in carousels" :key="i">
+                            <section class="hero is-medium">
+                                <div>
+                                    <img class="imgslider" :src="carousel.img_url" alt="">
+                                </div>
+                            </section>
+                        </b-carousel-item>
+                    </b-carousel>
+                </div>
                 <div class="chatcontainer">
                     <div class="chatinfo">
                         <img class="imgbtnoa" src="../assets/home-logo.png" alt="">
@@ -105,7 +107,7 @@
             </div>
         </div>
         <section>
-            <b-modal v-model="isrepestUserModal" width='80%' scroll="keep" >
+            <b-modal v-model="isrepestUserModal" width='80%' scroll="keep">
                 <div class="card">
                     <div class="card-content">
                         <div class="containerPopupLogin">
@@ -126,6 +128,7 @@
 <script>
 const key = import.meta.env.SECRET_KEY
 const API_URL = import.meta.env.VITE_APP_API_URL
+const BANNER_URL = import.meta.env.VITE_APP_BANNER_URL
 import axios from 'axios';
 import { followOA, getUserInfo, getAccessToken, getPhoneNumber, authorize, openChat } from "zmp-sdk/apis";
 import RequestUserInfo from '../popup/RequestUserInfo.vue';
@@ -139,8 +142,8 @@ export default {
             isSwitched: false,
             isSwitchedCustom: "Bấm để theo dõi",
             carousels: [],
-            userName: '',
-            phoneNumber: '',
+            userName: 'Nam',
+            phoneNumber: '0976750578',
             userInfo: [],
             phoneToken: '',
             userAccessToken: '',
@@ -149,15 +152,23 @@ export default {
             islogin: false,
             followStatus: 'Đang kiểm tra...',
             isrepestUserModal: false,
-            userid: ''
+            userid: '',
+            showBanner: false
         }
     },
     mounted() {
-        this.getPannerList()
+        this.getListBanner()
         // this.fetchUserInfo()
         this.checkIsLogin()
     },
     methods: {
+        async getListBanner() {
+            let listBanner = await axios.get(BANNER_URL)
+            if (listBanner.status === 200) {
+                this.carousels = listBanner.data.banners
+                this.showBanner = listBanner.data.is_show
+            }
+        },
         async openChatScreen() {
             try {
                 await openChat({
@@ -269,18 +280,6 @@ export default {
                 console.log(error);
             }
         },
-        async getPannerList() {
-            let pannerData = await axios.get('https://lab-gapi.guta.asia/v2/promotions', {
-                params: {
-                    position: 'home',
-                    location: 1
-                }
-            });
-            if (pannerData.status === 200) {
-                this.carousels = pannerData.data.campaigns.items
-            }
-
-        },
         async loginUser() {
             if (this.userName === null | this.userName === '') {
                 console.log('vui long nhap ten');
@@ -290,12 +289,12 @@ export default {
                 let userData = await axios.post(`${API_URL}/api/auth/login`, {
                     name: this.userName,
                     phone: this.phoneNumber,
-                    zlid:  this.userid
+                    zlid: this.userid
                 });
                 if (userData.status === 200) {
                     this.dataUser = userData.data
                     console.log(this.dataUser);
-                    
+
                     localStorage.setItem('user', JSON.stringify([this.dataUser]))
                     this.$router.push('/')
                 }

@@ -8,5 +8,13 @@ module.exports = {
         auth: false,
       },
     },
+    {
+      method: 'POST',
+      path: '/auth/linkAllUser',
+      handler: 'auth.linkAllUser',
+      config: {
+        auth: false,
+      },
+    },
   ],
 };
