@@ -7,7 +7,7 @@ const linkAccount = async (name, phone, zlid ) =>{
   let nameArr = name.split(" ").filter(item => item !== "")
   let firstName = nameArr.pop();
   let lastName = nameArr.join(" ")
-  let newPhone = phone.replace("84", "0");
+  let newPhone = phone.replace(/^84/, "0");
   let data = {
       sourceCode: process.env.SOURCECODE,
       partnerUserId: zlid,
